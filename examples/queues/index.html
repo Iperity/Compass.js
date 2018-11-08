@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+    <title>A demonstration of the Compass XMPP API</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/rxjs/6.3.2/rxjs.umd.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/strophe.js/1.2.16/strophe.min.js"></script>
+    <script src="../../node_modules/strophejs-plugin-pubsub/lib/strophe.pubsub.js"></script>
+    <script src='../../build/Compass.js'></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/color/jquery.color-2.1.2.min.js"></script>
+    <script src="https://unpkg.com/loglevel@1.6.1/dist/loglevel.min.js"></script>
+    <script src="client.js"></script>
+
+    <link href="client.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+
+<div id="login">
+
+    <div id="login_content" class="login_content">
+
+        <div class="login_header page_header">
+            <h1 class="login_title-main">CompassJS</h1>
+            <h2 class="login_subtitle">Queue Dashboard Example</h2>
+        </div>
+
+        <div id="login_container">
+            <h2 class="login_title">Log in</h2>
+            <div id="login_error" style="display: none"></div>
+
+            <div>
+                <form id="login_form" action="">
+                    <ul>
+                        <li><label class="login_label">Username</label><input class="login_input" type="text"
+                                                                              id="login_username"
+                                                                              placeholder="Type your username"/></li>
+                        <li><label class="login_label">Password</label><input class="login_input" type="password"
+                                                                              id="login_password"
+                                                                              placeholder="Type your password"/></li>
+                        <li><label class="login_label checkbox-label">Save password</label><input
+                                class="login_input login_checkbox" type="checkbox" id="save_password"/></li>
+                        <li><label class="login_label">Server</label><input class="login_input" type="text"
+                                                                            id="login_server"
+                                                                            placeholder="Type your server"/></li>
+                        <li><input class="login_btn" type="submit" id="login_submit" value="Log in"/></li>
+                    </ul>
+                </form>
+            </div>
+        </div>
+
+        <div id='loading' style='display: none'>
+            <img src='img/loading.gif'/>
+            <div id='connection_status'></div>
+        </div>
+
+    </div>
+</div>
+
+<div id='container' style='display: none'>
+    <div class="page_header queues_header">
+        <h1 class="login_title-main">CompassJS</h1>
+        <h2 class="login_subtitle">Queue Dashboard Example</h2>
+    </div>
+
+    <div class="queue_header">
+        <h2 class="queue_title">Queues</h2>
+    </div>
+
+    <div id='queue-list'>
+    </div>
+</div>
+
+<div id='templates' style='display: none'>
+    <div id='tpl_queue' class='queue_block'>
+        <div class="queue_info">
+            <div class="queue_top">
+                <div class="queue_status"></div>
+                <div class='queue_name'></div>
+            </div>
+            <div class='queue_agents'></div>
+            <div class='queue_calls'></div>
+            <button class='queue_login login'></button>
+        </div>
+    </div>
+</div>
+</body>
+</html>

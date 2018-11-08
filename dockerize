@@ -1,0 +1,11 @@
+#!/bin/bash -e
+
+ROOT=`readlink -f \`dirname $0\``
+
+if [ -z "$WORKSPACE" ]; then
+	# Not running within Jenkins
+	export WORKSPACE=$ROOT
+	export JOB_NAME=compassjs
+fi
+
+DOCKER_RUN_OPTS="--rm" DOCKER_CONTEXT_DIR=$ROOT/ci run-containerized "$*"

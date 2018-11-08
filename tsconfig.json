@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "lib" : ["es2017", "es2015.iterable", "dom"],
+    "target": "es5",
+    "noImplicitAny": false,
+    "sourceMap": true,
+    "baseUrl": "./",
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "declaration": true,
+    "outDir": "./build/",
+    "paths": {
+      "src/*": [
+        "./src/*"
+      ]
+    }
+  },
+  "awesomeTypescriptLoaderOptions": {
+    "useBabel": true,
+    "useCache": false,
+    "emitRequireType": false
+  },
+  "exclude": [
+    "node_modules",
+    "build"
+  ]
+}

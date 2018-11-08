@@ -1,0 +1,287 @@
+
+html {
+    font-size: 62.5%;
+    text-rendering: optimizeLegibility;
+    -moz-osx-font-smoothing: grayscale;
+    font-smoothing: antialiased;
+    -webkit-font-smoothing: antialiased;
+    text-shadow: rgba(0, 0, 0, .01) 0 0 1px;
+}
+
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body,
+input {
+    font-family: Montserrat, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    color: #141d25;
+    font-size: 1.4rem;
+}
+
+body {
+    background-color: #f2f6f7;
+}
+
+li {
+    list-style: none;
+}
+
+::selection {
+    background-color: rgba(207, 216, 220, 0.5);
+}
+
+h1 {
+    font-size: 3.8rem;
+}
+
+h2 {
+    font-size: 2.2rem;
+}
+
+h3 {
+    font-size: 1.8rem;
+}
+
+h4 {
+    font-size: 1.4rem;
+}
+
+h5 {
+    font-size: 1.2rem;
+}
+
+h6 {
+    font-size: 1.2rem;
+    text-transform: uppercase;
+}
+
+.page_header {
+    padding: 1.5rem 0;
+    text-align: center;
+}
+
+/** =========== login form ================ */
+
+#login {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+.login_content {
+    position: absolute;
+    top: 45%;
+    left: 50%;
+    bottom: auto;
+    right: auto;
+    transform: translate(-50%, -50%);
+    width: 40%;
+    max-width: 45rem;
+    min-width: 35rem;
+}
+
+.login_title-main {
+    font-weight: 500;
+}
+
+.login_subtitle {
+    font-size: 1.2rem;
+    color: #52616f;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.15rem;
+    display: inline-block;
+    padding: 1.5rem 1.5rem .9rem 0;
+}
+
+#login_container {
+    padding: 6rem;
+    box-shadow: 0 0.5rem 1.4rem -0.1rem rgba(20, 29, 37, 0.2);
+    border-radius: .7rem;
+    background-color: #ffffff;
+}
+
+#login_container ul {
+    width: 100%;
+}
+
+#loading {
+    text-align: center;
+}
+
+#loading img {
+    padding-bottom: 3rem;
+}
+
+.login_title,
+.queue_title {
+    padding-bottom: 3rem;
+    text-align: center;
+    font-weight: 500;
+}
+
+#login_form {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+}
+
+.login_label {
+    font-size: 1.1rem;
+    color: #d3115a;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.15rem;
+    display: inline-block;
+    padding: 1.5rem 1.5rem .9rem 0;
+}
+
+.login_input {
+    padding: .9rem 1.5rem;
+    border-radius: .7rem;
+    border: 1px solid #cfd8dc;
+    width: 100%;
+}
+
+.login_input:focus {
+    outline: none;
+    border: 1px solid #d3115a;
+    border-radius: .7rem;
+}
+
+.login_input:focus::placeholder {
+    color: transparent;
+}
+
+.checkbox-label {
+    padding-bottom: 0; /* There is too much space between the labels if input is only checkbox */
+}
+
+.login_checkbox {
+    width: unset;
+    font-size: 5rem;
+}
+
+.login_btn {
+    padding: .9rem 1.5rem;
+    margin-top: 1.5rem;
+    width: 100%;
+    border-radius: .7rem;
+    border: 0;
+    background-color: #d3115a;
+    color: #ffffff;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.login_btn:hover,
+.login_btn:focus {
+    background-color: #c51054;
+}
+
+#login_error {
+    color: #EF5350;
+    padding: 1.5rem;
+}
+
+/** =========== queues ================ */
+
+.queues_header {
+    padding: 4.5rem;
+}
+
+#container {
+    position: absolute;
+    top: 0;
+    bottom: auto;
+    left: 0;
+    right: auto;
+    min-height: 100vh;
+    min-width: 100vw;
+}
+
+.queue_header {
+    margin: 0 3rem;
+}
+
+#queue-list {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    justify-content: center;
+    margin: 0 3rem;
+}
+
+.queue_block {
+    background-color: #ffffff;
+    margin: 1.5rem;
+    padding: 3rem;
+    box-shadow: 0 0.5rem 1.4rem -0.1rem rgba(20, 29, 37, 0.2);
+    border-radius: .7rem;
+    flex-basis: 50%;
+    min-width: 25rem;
+}
+
+.queue_info div:not(:last-child) {
+    margin-bottom: .9rem;
+}
+
+.queue_top {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    align-items: center;
+}
+
+.queue_name {
+    font-size: 1.8rem;
+    font-weight: 500;
+}
+
+.queue_status {
+    height: 1.2rem;
+    width: 1.2rem;
+    border-radius: 100%;
+    margin-top: 8px;
+    margin-right: .9rem;
+}
+
+.queue_login {
+    font-size: 1.2rem;
+    background-color: #cfd8dc;
+    color: #141d25;
+    font-weight: 500;
+    padding: .5rem 1.5rem;
+    border: 1px solid #cfd8dc;
+    border-radius: .5rem;
+    margin-top: .9rem;
+}
+
+button.logout {
+    background-color: #cfd8dc;
+}
+
+button.logout:hover,
+button.logout:focus {
+    outline: none;
+    background-color: #c6d1d6;
+    cursor: pointer;
+}
+
+button.login {
+    background-color: #f2f6f7;
+}
+
+button.login:hover,
+button.login:focus {
+    outline: none;
+    background-color: #e9eff1;
+    cursor: pointer;
+}
