@@ -1,6 +1,6 @@
 {
   "name": "compass.js",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "",
   "main": "./build/Compass.js",
   "types": "./build/Compass.d.ts",
@@ -21,7 +21,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git://github.com/Iperity/CompassJS.git"
+    "url": "git://github.com/Iperity/Compass.js.git"
   },
   "nyc": {
     "extension": [
