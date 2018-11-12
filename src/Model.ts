@@ -177,6 +177,21 @@ export class CallPoint extends CompassObject {
         super(id, xmlElement, domain);
         this.state = CallPointState.inactive;
     }
+
+    /**
+     * Get the duration (in seconds) that the call has had this callpoint.
+     */
+    public getDuration(): number {
+        return getDurationBetween(this.timeCreated, this.timeEnded);
+    }
+
+    /**
+     * Get the duration (in seconds) that this callpoint has been *answered*,
+     * or NaN if the callpoint has not yet been answered.
+     */
+    public getAnsweredDuration(): number {
+        return getDurationBetween(this.timeStarted, this.timeEnded);
+    }
 }
 
 /**
@@ -588,4 +603,23 @@ export default class Model {
     private usersSubject: Subject<Event> = new Subject();
     private callsSubject: Subject<Event> = new Subject();
     private queuesSubject: Subject<Event> = new Subject();
+}
+
+/**
+ * Get the duration between two timestamps in seconds.
+ * @param startSec the start time; if not given, NaN is returned
+ * @param endSec the end time; if not given, the current date is used
+ */
+function getDurationBetween(startSec: number, endSec: number) {
+
+    // if no start time, there is no duration
+    if (!startSec) {
+        return NaN;
+    }
+
+    // if no end time specified, calculate until now
+    if (!endSec) {
+        endSec = (new Date().getTime()) / 1000;
+    }
+    return endSec - startSec;
 }

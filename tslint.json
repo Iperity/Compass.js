@@ -18,6 +18,7 @@
     "max-classes-per-file": false,
     "no-consecutive-blank-lines": false,
     "no-empty": false,
+    "no-trailing-whitespace": [true, "ignore-blank-lines"],
     "object-literal-shorthand": false,
     "object-literal-sort-keys": false,
     "ordered-imports": false,
