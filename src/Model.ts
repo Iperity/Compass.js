@@ -163,8 +163,10 @@ export class CallPoint extends CompassObject {
 
     /**
      * End time - when the callpoint has been hung up.
+     * TODO: Lisa is only setting this for terminated calls that are retrieved through
+     * an IQ get. If we want to expose this, we should fill it ourselves.
      */
-    public timeEnded: number;
+    // public timeEnded: number;
 
     /**
      * Create a CallPoint
@@ -179,18 +181,18 @@ export class CallPoint extends CompassObject {
     }
 
     /**
-     * Get the duration (in seconds) that the call has had this callpoint.
+     * Get the duration (in seconds) since the call reached this callpoint.
      */
     public getDuration(): number {
-        return getDurationBetween(this.timeCreated, this.timeEnded);
+        return getDurationFrom(this.timeCreated);
     }
 
     /**
-     * Get the duration (in seconds) that this callpoint has been *answered*,
+     * Get the duration (in seconds) since this callpoint has been *answered*,
      * or NaN if the callpoint has not yet been answered.
      */
     public getAnsweredDuration(): number {
-        return getDurationBetween(this.timeStarted, this.timeEnded);
+        return getDurationFrom(this.timeStarted);
     }
 }
 
@@ -606,20 +608,16 @@ export default class Model {
 }
 
 /**
- * Get the duration between two timestamps in seconds.
+ * Get the duration from the given timestamps (in seconds).
  * @param startSec the start time; if not given, NaN is returned
- * @param endSec the end time; if not given, the current date is used
  */
-function getDurationBetween(startSec: number, endSec: number) {
+function getDurationFrom(startSec: number) {
 
     // if no start time, there is no duration
     if (!startSec) {
         return NaN;
     }
-
-    // if no end time specified, calculate until now
-    if (!endSec) {
-        endSec = (new Date().getTime()) / 1000;
-    }
+    
+    const endSec = (new Date().getTime()) / 1000;
     return endSec - startSec;
 }

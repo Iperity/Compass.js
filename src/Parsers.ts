@@ -184,7 +184,7 @@ class CallPointParser implements IParser {
         cp.state = elem.find('>state').text() as CallPointState;
         cp.timeCreated = Number(elem.find('>timeCreated').text());
         cp.timeStarted = parseNumberOrNull(elem.find('>timeStarted').text());
-        cp.timeEnded = parseNumberOrNull(elem.find('>timeEnded').text());
+        //cp.timeEnded = parseNumberOrNull(elem.find('>timeEnded').text());
     }
 }
 ParserRegistry.registerParser(new CallPointParser(), ObjectType.CallPoint);

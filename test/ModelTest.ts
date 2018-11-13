@@ -84,11 +84,6 @@ describe('Model :: Callpoint', () => {
         cp.timeStarted = 200;
         expect(cp.getAnsweredDuration() < cp.getDuration()).is.true;
         expect(cp.getAnsweredDuration() > 200).is.true;
-
-        // for given end time
-        cp.timeEnded = 300;
-        expect(cp.getDuration()).to.equal(200);
-        expect(cp.getAnsweredDuration()).to.equal(100);
     });
 });
 

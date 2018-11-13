@@ -12,6 +12,7 @@
       "ban-keywords",
       "allow-leading-underscore"
     ],
+    "comment-format": false,
     "curly": false,
     "arrow-parens": false,
     "max-line-length": false,
