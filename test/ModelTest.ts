@@ -69,6 +69,24 @@ describe('Model', () => {
    });
 });
 
+describe('Model :: Callpoint', () => {
+    it('durations', () => {
+        const model = getTestModel();
+        const cp = model.calls[CALL_ID_1].source;
+
+        expect(cp.getDuration()).to.be.NaN;
+        expect(cp.getAnsweredDuration()).to.be.NaN;
+
+        cp.timeCreated = 100;
+        expect(cp.getDuration() > 100).is.true;
+        expect(cp.getAnsweredDuration()).to.be.NaN;
+
+        cp.timeStarted = 200;
+        expect(cp.getAnsweredDuration() < cp.getDuration()).is.true;
+        expect(cp.getAnsweredDuration() > 200).is.true;
+    });
+});
+
 describe('Model :: User', () => {
     it('getQueues', () => {
         const model = getTestModel();
