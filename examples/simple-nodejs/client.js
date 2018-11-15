@@ -1,0 +1,99 @@
+// Get a jQuery with a simulated 'window' object, and get jQuery in the global namespace.
+const jsdom = require("jsdom");
+const { JSDOM } = jsdom;
+const { window } = (new JSDOM());
+const $ = window.jQuery = require('jquery')(window);
+require('jsdom-global')();
+global.$ = $;
+
+// Load required libraries
+require('strophe.js');
+require("strophejs-plugin-pubsub");
+const rxjs = require("rxjs");
+const Compass = require("compass.js");
+
+// Load the config (copy from config-example.js and fill out your own credentials)
+const config = require("./config.js");
+
+
+// Create the connection, and connect.
+const conn  = new Compass.Connection(config.basedom);
+
+// For debugging:
+// Compass.compassLogger.setLevel(Compass.compassLogger.levels.DEBUG);
+// conn.logXmpp = true;
+
+const promise = conn.connect(config.jid, config.password);
+
+// We are connected and all data-models have been retrieved.
+promise.then(function () {
+    console.log("We have connected, and all data has been retrieved.");
+
+    console.log("Got the following users:");
+    display(conn.model.users);
+
+    console.log("Got the following queues:");
+    display(conn.model.queues);
+
+    console.log("Got the following calls:");
+    display(conn.model.calls);
+
+    // Listen to the userList
+    conn.model.usersObservable.subscribe(event => {
+        console.log(`User ${event.emitter.name} (${event.emitter.id}) event: ${event.eventType}`);
+        if (event.eventType === Compass.EventType.PropertyChanged) {
+            logPropertyChanged(event);
+        }
+    });
+
+    // Listen to the queue-list
+    conn.model.queuesObservable.subscribe(event => {
+        console.log(`Queue ${event.emitter.name} (${event.emitter.id}) event: ${event.eventType}`);
+        if (event.eventType === Compass.EventType.PropertyChanged) {
+            logPropertyChanged(event);
+        }
+    });
+
+    // Listen to the call-list
+    conn.model.callsObservable.subscribe(event => {
+        console.log(`Call ${event.emitter.id} event: ${event.eventType}`);
+        switch (event.eventType) {
+            case Compass.EventType.Changed:
+                let details = '';
+                switch (event.data.updateType) {
+                    case 'SOURCE':
+                        details = 'source changed to ' + event.emitter.source;
+                        break;
+                    case 'DESTINATION':
+                        details = 'destination changed to ' + event.emitter.destination;
+                        break;
+                    case 'STATE':
+                        details = 'state changed to ' + event.emitter.state;
+                        break;
+                }
+                console.log(`... ${details}`);
+                break;
+            case Compass.EventType.PropertyChanged:
+                logPropertyChanged(event);
+                break;
+        }
+    });
+
+    console.log("Waiting for changes.");
+}, function(e) {
+    console.log("Login failed: ", e);
+});
+
+
+/*
+ * console.log the object
+ */
+function display(map) {
+    for (const [key, obj] of Object.entries(map)) {
+        console.log(obj);
+    }
+}
+
+function logPropertyChanged(event) {
+    console.log(`... ${event.data.name} from '${event.data.oldValue}' to '${event.data.newValue}'`);
+}
