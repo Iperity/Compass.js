@@ -119,6 +119,14 @@ export class Call extends CompassObject {
      */
     public destination: CallPoint;
 
+    /**
+     * The parent call, if the call has a parent call.
+     * 
+     * If this is a dial attempt from the queue to an agent, the parent call is
+     * the queue call.
+     */
+    public parentCall: Call;
+
     public getEndpoint(side: Side) {
         return side === Side.source ? this.source : this.destination;
     }

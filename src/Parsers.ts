@@ -149,6 +149,11 @@ class CallParser implements IParser {
         const parser = parserContext.parser;  // We need the parser to parse the callPoints.
         call.source = parser.parse(elem.find('>source'), ObjectType.CallPoint) as CallPoint;
         call.destination = parser.parse(elem.find('>destination'), ObjectType.CallPoint) as CallPoint;
+        
+        const parentCallElem = elem.find('>properties >QueueCallForCall');
+        if (parentCallElem.length) {
+            call.parentCall = parserContext.model.calls[parentCallElem.text()];
+        }
 
         return call;
     }
