@@ -48,14 +48,17 @@ promise.then(function () {
             case Compass.EventType.Changed:
                 let details = '';
                 switch (event.data.updateType) {
-                    case 'SOURCE':
+                    case 'source':
                         details = 'source changed to ' + event.emitter.source;
                         break;
-                    case 'DESTINATION':
+                    case 'destination':
                         details = 'destination changed to ' + event.emitter.destination;
                         break;
-                    case 'STATE':
+                    case 'state':
                         details = 'state changed to ' + event.emitter.state;
+                        break;
+                    default:
+                        details = event.data.updateType;
                         break;
                 }
                 console.log(`... ${details}`);
