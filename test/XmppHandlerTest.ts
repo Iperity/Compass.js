@@ -1,13 +1,14 @@
-import Model, {
+import {
+    Model,
     CallPointState,
     CallPointType,
     ExternalCallPoint,
     UserCallPoint,
     DialplanCallPoint, Call, Queue, QueueCallPoint, CallState, CallEndReason,
 } from "../src/Model";
-import XmppHandler from "../src/XmppHandler";
-import Event, { EventType } from "../src/Events";
-import { expect } from 'chai';
+import {XmppHandler} from "../src/XmppHandler";
+import {Event, EventType} from "../src/Events";
+import {expect} from 'chai';
 import {Observable} from "rxjs";
 
 // Setup jQuery for tests.

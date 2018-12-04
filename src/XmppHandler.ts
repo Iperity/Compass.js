@@ -1,6 +1,7 @@
-import Event, {EventType} from './Events';
-import compassLogger from "./Logging";
-import Model, {
+import {Event, EventType} from './Events';
+import {compassLogger} from "./Logging";
+import {
+    Model,
     Call,
     CallEndReason,
     CallPoint,
@@ -17,7 +18,7 @@ import {ParserRegistry, ObjectType, parseBoolean, parseNumberOrNull} from "./Par
 /**
  * Retrieves XMPP XML stanzas, and modifies the Model accordingly.
  */
-export default class XmppHandler {
+export class XmppHandler {
     protected _handler: XmppNotificationHandler;
     protected parser: ParserRegistry;
 

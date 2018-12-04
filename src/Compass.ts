@@ -4,11 +4,11 @@ import "strophe.js";
 import "strophejs-plugin-pubsub";
 
 // exports
-import Connection from "./Connection";
+import {Connection} from "./Connection";
 import {CallEndReason, Side, OtherSide, CallState, CallPointState, CallPointType} from "./Model";
-import compassLogger, {rootLogger} from "./Logging";
-import Event, {EventType} from "./Events";
-import RestApi from "./RestApi";
+import {compassLogger, rootLogger} from "./Logging";
+import {Event, EventType} from "./Events";
+import {RestApi} from "./RestApi";
 
 export {
     Connection,

@@ -1,8 +1,8 @@
 import {randomstring} from "./Utils";
-import Model from "./Model";
-import XmppHandler from "./XmppHandler";
-import RestApi from "./RestApi";
-import compassLogger from "./Logging";
+import {Model} from "./Model";
+import {XmppHandler} from "./XmppHandler";
+import {RestApi} from "./RestApi";
+import {compassLogger} from "./Logging";
 import Builder = Strophe.Builder;
 import { Strophe as Strophe, $iq, $pres} from "strophe.js";
 
@@ -17,7 +17,7 @@ Strophe.addNamespace('PING', 'urn:xmpp:ping');
  *
  * An object of the 'Connection' class is the entry point for the CompassJS library.
  */
-export default class Connection {
+export class Connection {
 
     /** Set to 'true' to enable logging of each incoming and outgoing XMPP stanza. Logged at 'DEBUG' logging level. */
     public logXmpp: boolean = false;

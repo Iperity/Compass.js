@@ -1,6 +1,4 @@
-import Model, {
-    Call,
-} from "../src/Model";
+import {Model, Call} from "../src/Model";
 import {expect} from 'chai';
 import {ObjectType, ParserRegistry} from "../src/Parsers";
 

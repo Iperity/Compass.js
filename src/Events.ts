@@ -39,7 +39,7 @@ export enum EventType {
     Invalidated = "Invalidated",
 }
 
-export default class Event {
+export class Event {
     public emitter: CompassObject;
     public eventType: EventType;
     public data: any;

@@ -1,5 +1,5 @@
 import {Observable, Subject} from "rxjs";
-import Event, {EventType} from "./Events";
+import {Event, EventType} from "./Events";
 
 /**
  * The states that a call can be in. (See in Call.state)
@@ -530,7 +530,7 @@ export class Queue extends CompassObject {
 /**
  * The model, representing the state of a Company on the Compass platform.
  */
-export default class Model {
+export class Model {
     /**
      * The compant that the model pertains to.
      */

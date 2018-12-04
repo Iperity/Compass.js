@@ -17,9 +17,8 @@ export const rootLogger = loglevel;
  * library. Clients can use this logger to set log-level for the Compass.js library without affecting other logging,
  * or to attach plugins / change formatting for the Library logging specifically.
  */
-const compassLogger = rootLogger.getLogger("CompassJS");
+export const compassLogger = rootLogger.getLogger("CompassJS");
 compassLogger.setLevel(compassLogger.levels.WARN);
-export default compassLogger;
 
 
 

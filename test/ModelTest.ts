@@ -1,5 +1,5 @@
-import Connection from "../src/Connection";
-import Model from "../src/Model";
+import {Connection} from "../src/Connection";
+import {Model} from "../src/Model";
 import {CompassObject, User, Queue, QueueMember, Call, Company, CallState, CallPoint, CallPointState, UserCallPoint, QueueCallPoint} from "../src/Model";
 import { expect } from 'chai';
 
