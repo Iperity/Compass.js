@@ -8,7 +8,7 @@ module.exports = {
     entry: './src/Compass.ts',
     output: {
         filename: 'Compass.js',
-        library: 'Compass',
+        library: 'compass.js',
         path: path.resolve(__dirname, 'build'),
         libraryTarget: 'umd'
     },
@@ -37,11 +37,11 @@ module.exports = {
 
     plugins: [
         new DtsBundleWebpack({
-            name: 'Compass',
+            name: 'compass.js',
             main: './build/src/Compass.d.ts',
             out: '../Compass.d.ts',
             removeSource: true,
-            outputAsModuleFolder: true // to use npm in-package typings
+            //outputAsModuleFolder: true // to use npm in-package typings
         })
     ]
 };

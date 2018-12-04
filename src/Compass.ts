@@ -4,18 +4,11 @@ import "strophe.js";
 import "strophejs-plugin-pubsub";
 
 // exports
-import {Connection} from "./Connection";
-import {CallEndReason, Side, OtherSide, CallState, CallPointState, CallPointType} from "./Model";
-import {compassLogger, rootLogger} from "./Logging";
-import {Event, EventType} from "./Events";
-import {RestApi} from "./RestApi";
-
-export {
-    Connection,
-    Event, EventType,
-    Side, OtherSide,
-    CallState, CallPointState, CallPointType, CallEndReason,
-    RestApi,
-    compassLogger, rootLogger,
-};
+export {Connection} from "./Connection";
+export {CallEndReason, Side, OtherSide, CallState, CallPointState, CallPointType, Call,
+    CallPoint, User, UserCallPoint, DialplanCallPoint, ExternalCallPoint, QueueCallPoint,
+    Queue, QueueMember, Company, Model} from "./Model";
+export {compassLogger, rootLogger} from "./Logging";
+export {Event, EventType} from "./Events";
+export {RestApi} from "./RestApi";
 
