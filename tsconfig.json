@@ -9,6 +9,7 @@
     "removeComments": true,
     "preserveConstEnums": true,
     "declaration": true,
+    "declarationDir": "./build/types",
     "outDir": "./build/",
     "paths": {
       "src/*": [
@@ -21,8 +22,7 @@
     "useCache": false,
     "emitRequireType": false
   },
-  "exclude": [
-    "node_modules",
-    "build"
+  "include": [
+    "src/**/*.ts"
   ]
 }

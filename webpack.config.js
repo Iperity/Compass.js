@@ -38,10 +38,10 @@ module.exports = {
     plugins: [
         new DtsBundleWebpack({
             name: 'compass.js',
-            main: './build/src/Compass.d.ts',
-            out: '../Compass.d.ts',
+            main: path.resolve(__dirname, 'build') + '/types/Compass.d.ts',
+            out: path.resolve(__dirname, 'build') + '/Compass.d.ts',
+            outputAsModuleFolder: true, // to use npm in-package typings,
             removeSource: true,
-            //outputAsModuleFolder: true // to use npm in-package typings
         })
     ]
 };
