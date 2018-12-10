@@ -48,6 +48,7 @@ module.exports = {
 
 // externalize dependencies
 module.exports.externals = [
+    { jquery: 'jquery' },
     webpackRxjsExternals(),
     webpackStropheExternals,
     'strophejs-plugin-pubsub'

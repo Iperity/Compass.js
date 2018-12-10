@@ -5,6 +5,11 @@ import {RestApi} from "./RestApi";
 import {compassLogger} from "./Logging";
 import Builder = Strophe.Builder;
 import { Strophe as Strophe, $iq, $pres} from "strophe.js";
+import * as $ from "jquery";
+
+// instruct webpack to include strophejs dependency
+// even through we're not actually importing anything from it
+import "strophejs-plugin-pubsub";
 
 const COMPASS_NS = "http://iperity.com/compass";
 export {COMPASS_NS};

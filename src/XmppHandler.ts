@@ -14,6 +14,7 @@ import {
     UserCallPoint,
 } from "./Model";
 import {ParserRegistry, ObjectType, parseBoolean, parseNumberOrNull} from "./Parsers";
+import * as $ from "jquery";
 
 /**
  * Retrieves XMPP XML stanzas, and modifies the Model accordingly.

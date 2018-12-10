@@ -1,5 +1,6 @@
 import Promise = JQuery.Promise;
 import {compassLogger} from "./Logging";
+import * as $ from "jquery";
 
 const CONTENT_TYPE = 'application/vnd.iperity.compass.v2+json';
 

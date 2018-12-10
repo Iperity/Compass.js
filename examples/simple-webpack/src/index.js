@@ -6,7 +6,7 @@ if (typeof config === 'undefined') {
 }
 
 // Create the connection, and connect.
-const conn  = new Compass.Connection(config.basedom);
+const conn = new Compass.Connection(config.basedom);
 
 
 // For debugging:
