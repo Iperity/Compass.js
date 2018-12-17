@@ -1,10 +1,7 @@
+import * as $ from 'jquery';
 import {Model, Call} from "../src/Model";
 import {expect} from 'chai';
 import {ObjectType, ParserRegistry} from "../src/Parsers";
-
-import {JSDOM} from "jsdom";
-const { window } = new JSDOM();
-const $ = require('jquery')(window);
 
 const callSetupWithParent = $.parseXML(
     '<call xmlns="http://iperity.com/compass" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ' +
@@ -28,7 +25,7 @@ const callSetupWithParent = $.parseXML(
     '      <state>CONNECTING</state>\n' +
     '      <properties><QueueCallForCall>123</QueueCallForCall></properties>\n' +
     '   </call>'
-);
+).documentElement;
 
 // Tests
 
@@ -47,7 +44,7 @@ describe('Parsers :: Call', () => {
         const parentCall = new Call('123', null, model);
         model.calls['123'] = parentCall;
         
-        const childCall = registry.parse($(callSetupWithParent).children(), ObjectType.Call) as Call;
+        const childCall = registry.parse($(callSetupWithParent), ObjectType.Call) as Call;
         expect(childCall.parentCall).to.equal(parentCall);
     });
 });
