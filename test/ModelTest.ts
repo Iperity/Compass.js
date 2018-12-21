@@ -1,15 +1,7 @@
-import Connection from "../src/Connection";
-import Model from "../src/Model";
-import {CompassObject, User, Queue, QueueMember, Call, Company, CallState, CallPoint, CallPointState, UserCallPoint, QueueCallPoint} from "../src/Model";
+import {Connection} from "../src/Connection";
+import {Model} from "../src/Model";
+import { User, Queue, QueueMember, Call, CallState, CallPointState, UserCallPoint, QueueCallPoint} from "../src/Model";
 import { expect } from 'chai';
-
-// Setup jQuery for tests.
-
-const jsdom = require("jsdom");
-const { JSDOM } = jsdom;
-const { window } = (new JSDOM());
-const globalAny: any = global;
-const $ = globalAny.jQuery = require('jquery')(window);
 
 /* Constants */
 const   CALL_STATE_RINGING      = CallState.ringing,

@@ -8,7 +8,7 @@ module.exports = {
     entry: './src/Compass.ts',
     output: {
         filename: 'Compass.js',
-        library: 'Compass',
+        library: 'compass.js',
         path: path.resolve(__dirname, 'build'),
         libraryTarget: 'umd'
     },
@@ -37,17 +37,18 @@ module.exports = {
 
     plugins: [
         new DtsBundleWebpack({
-            name: 'Compass',
-            main: './build/src/Compass.d.ts',
-            out: '../Compass.d.ts',
+            name: 'compass.js',
+            main: path.resolve(__dirname, 'build') + '/types/Compass.d.ts',
+            out: path.resolve(__dirname, 'build') + '/Compass.d.ts',
+            outputAsModuleFolder: true, // to use npm in-package typings,
             removeSource: true,
-            outputAsModuleFolder: true // to use npm in-package typings
         })
     ]
 };
 
 // externalize dependencies
 module.exports.externals = [
+    { jquery: 'jquery' },
     webpackRxjsExternals(),
     webpackStropheExternals,
     'strophejs-plugin-pubsub'

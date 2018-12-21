@@ -1,22 +1,16 @@
-import Model, {
+import * as $ from 'jquery';
+import {
+    Model,
     CallPointState,
     CallPointType,
     ExternalCallPoint,
     UserCallPoint,
     DialplanCallPoint, Call, Queue, QueueCallPoint, CallState, CallEndReason,
 } from "../src/Model";
-import XmppHandler from "../src/XmppHandler";
-import Event, { EventType } from "../src/Events";
-import { expect } from 'chai';
+import {XmppHandler} from "../src/XmppHandler";
+import {Event, EventType} from "../src/Events";
+import {expect} from 'chai';
 import {Observable} from "rxjs";
-
-// Setup jQuery for tests.
-
-const jsdom = require("jsdom");
-const { JSDOM } = jsdom;
-const { window } = (new JSDOM());
-const globalAny: any = global;
-const $ = globalAny.$ = globalAny.jQuery = require('jquery')(window);
 
 // Simple event-collection class
 class EventRecorder {
@@ -80,14 +74,15 @@ const xmlCreateQueueNotification = $.parseXML(
     "\txmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"queueCreateNotification\"\n" +
     "\ttype=\"notification.queue.create\" timestamp=\"1234\">\n" +
     xmlQueueString +
-    "</notification>");
+    "</notification>"
+).documentElement;
 const xmlGetCompanyResult = $.parseXML(
     "<result xmlns=\"http://iperity.com/compass\" xmlns:xsi=\"http://www.w3.org\n" +
     "          /2001/XMLSchema-instance\" xsi:type=\"getCompanyResult\">" +
     "   <id>company1id</id>" +
     "   <name>company1name</name>" +
     "</result>",
-);
+).documentElement;
 const xmlGetUsersResult = $.parseXML(
     '<result xmlns="http://iperity.com/compass" xmlns:xsi="http://www.w3.org\n' +
     '          /2001/XMLSchema-instance" xsi:type="getResult">\n' +
@@ -105,7 +100,7 @@ const xmlGetUsersResult = $.parseXML(
     '            <extensions>200</extensions>\n' +
     '         </user>\n' +
     '      </result>',
-);
+).documentElement;
 const xmlCreateUserNotification = $.parseXML(
     '<notification xmlns="http://iperity.com/compass" xmlns:xsi="' +
     '                   http://www.w3.org/2001/XMLSchema-instance" timestamp\n' +
@@ -126,7 +121,7 @@ const xmlCreateUserNotification = $.parseXML(
     '                        <extensions>200</extensions>\n' +
     '                    </user>\n' +
     '</notification>',
-);
+).documentElement;
 const xmlUpdateUserNotification = $.parseXML(
     '<notification xmlns="http://iperity.com/compass" xmlns:xsi="\n' +
     '                   http://www.w3.org/2001/XMLSchema-instance" timestamp\n' +
@@ -139,7 +134,7 @@ const xmlUpdateUserNotification = $.parseXML(
     '                    <newValue>Tijs Testuser</newValue>\n' +
     '                  </propertyChange>\n' +
     '</notification>',
-);
+).documentElement;
 const xmlDestroyUserNotification = $.parseXML(
     '<notification xmlns="http://iperity.com/compass" xmlns:xsi="\n' +
     '                   http://www.w3.org/2001/XMLSchema-instance" timestamp\n' +
@@ -147,7 +142,7 @@ const xmlDestroyUserNotification = $.parseXML(
     '                   destroyUserNotification">\n' +
     '                  <userId>8323556</userId>\n' +
     '</notification>',
-);
+).documentElement;
 const xmlGetCallsResult = $.parseXML(
     '<result xmlns="http://iperity.com/compass" xmlns:xsi="http://www.w3.org\n' +
     '          /2001/XMLSchema-instance" xsi:type="getResult">\n' +
@@ -171,7 +166,7 @@ const xmlGetCallsResult = $.parseXML(
     '         <state>RINGING</state>' +
     '    </call>\n' +
     '</result>',
-    );
+).documentElement;
 const xmlCallStartNotification = $.parseXML('<notification xmlns="http://iperity.com/compass" xmlns:xsi="\n' +
     '       http://www.w3.org/2001/XMLSchema-instance" timestamp\n' +
     '       ="1492705754" type="notification.call.start" xsi:type="\n' +
@@ -197,7 +192,7 @@ const xmlCallStartNotification = $.parseXML('<notification xmlns="http://iperity
     '      <properties />\n' +
     '   </call>\n' +
     '</notification>',
-);
+).documentElement;
 const xmlCallUpdateSourceNotification = $.parseXML('<notification xmlns="http://iperity.com/compass" xmlns:xsi="\n' +
     '       http://www.w3.org/2001/XMLSchema-instance" timestamp\n' +
     '       ="1492705754" type="notification.call.update" xsi:type="\n' +
@@ -224,7 +219,7 @@ const xmlCallUpdateSourceNotification = $.parseXML('<notification xmlns="http://
     '      <properties />\n' +
     '   </call>\n' +
     '</notification>',
-);
+).documentElement;
 const xmlCallUpdateDestinationNotification = $.parseXML('<notification xmlns="http://iperity.com/compass" xmlns:xsi="\n' +
     '       http://www.w3.org/2001/XMLSchema-instance" timestamp\n' +
     '       ="1492705754" type="notification.call.update" xsi:type="\n' +
@@ -252,7 +247,7 @@ const xmlCallUpdateDestinationNotification = $.parseXML('<notification xmlns="ht
     '      <properties />\n' +
     '   </call>\n' +
     '</notification>',
-);
+).documentElement;
 const xmlCallUpdateDestinationQueueNotification = $.parseXML('<notification xmlns="http://iperity.com/compass" xmlns:xsi="\n' +
     '       http://www.w3.org/2001/XMLSchema-instance" timestamp\n' +
     '       ="1492705754" type="notification.call.update" xsi:type="\n' +
@@ -279,7 +274,7 @@ const xmlCallUpdateDestinationQueueNotification = $.parseXML('<notification xmln
     '      <properties />\n' +
     '   </call>\n' +
     '</notification>',
-);
+).documentElement;
 const xmlCallUpdateStateNotification = $.parseXML('<notification xmlns="http://iperity.com/compass" xmlns:xsi="\n' +
     '       http://www.w3.org/2001/XMLSchema-instance" timestamp\n' +
     '       ="1492705754" type="notification.call.update" xsi:type="\n' +
@@ -306,7 +301,7 @@ const xmlCallUpdateStateNotification = $.parseXML('<notification xmlns="http://i
     '      <properties />\n' +
     '   </call>\n' +
     '</notification>',
-);
+).documentElement;
 const xmlCallEndNotification = $.parseXML('<notification xmlns="http://iperity.com/compass" xmlns:xsi="\n' +
     '       http://www.w3.org/2001/XMLSchema-instance" timestamp\n' +
     '       ="1492705754" type="notification.call.end" xsi:type="\n' +
@@ -314,7 +309,7 @@ const xmlCallEndNotification = $.parseXML('<notification xmlns="http://iperity.c
     '      <callId>IKhDw.MuTOkUTDa8nEV-6dd.c133ada042758fa0b92a6ed8621bd224.0</callId>' +
     '      <endReason>DESTINATION_HANGUP</endReason>' +
     '</notification>',
-);
+).documentElement;
 const xmlGetQueuesResult = $.parseXML('<result xmlns="http://iperity.com/compass" xmlns:xsi="http://www.w3.org\n' +
     '          /2001/XMLSchema-instance" xsi:type="getResult">\n' +
     '         <queue id="1442896">\n' +
@@ -333,7 +328,8 @@ const xmlGetQueuesResult = $.parseXML('<result xmlns="http://iperity.com/compass
     '            <totalCalls>21</totalCalls>\n' +
     '            <handledCalls>14</handledCalls>\n' +
     '         </queue>\n' +
-    '      </result>');
+    '      </result>'
+).documentElement;
 const xmlQueueCallEnterNotification = $.parseXML('<notification xmlns="http://iperity.com/compass" xmlns:xsi="\n' +
     '       http://www.w3.org/2001/XMLSchema-instance" timestamp\n' +
     '       ="1492705754" type="notification.queue.call.enter" xsi:type="\n' +
@@ -343,7 +339,7 @@ const xmlQueueCallEnterNotification = $.parseXML('<notification xmlns="http://ip
     '             <callId>IKhDw.MuTOkUTDa8nEV-6dd.c133ada042758fa0b92a6ed8621bd224.0</callId>\n' +
     '       </queueCall> \n' +
     '</notification>',
-);
+).documentElement;
 const xmlQueueCallLeaveNotification = $.parseXML('<notification xmlns="http://iperity.com/compass" xmlns:xsi="\n' +
     '       http://www.w3.org/2001/XMLSchema-instance" timestamp\n' +
     '       ="1492705754" type="notification.queue.call.leave" xsi:type="\n' +
@@ -353,7 +349,7 @@ const xmlQueueCallLeaveNotification = $.parseXML('<notification xmlns="http://ip
     '             <callId>IKhDw.MuTOkUTDa8nEV-6dd.c133ada042758fa0b92a6ed8621bd224.0</callId>\n' +
     '       </queueCall> \n' +
     '</notification>',
-);
+).documentElement;
 const xmlQueueUpdateNotification = $.parseXML('<notification xmlns="http://iperity.com/compass" xmlns:xsi="\n' +
     '       http://www.w3.org/2001/XMLSchema-instance" timestamp\n' +
     '       ="1492705754" type="notification.queue.update" xsi:type="\n' +
@@ -365,14 +361,14 @@ const xmlQueueUpdateNotification = $.parseXML('<notification xmlns="http://iperi
     '           <newValue>Her Queue</newValue>' +
     '       </propertyChange>' +
     '</notification>',
-);
+).documentElement;
 const xmlQueueDestroyNotification = $.parseXML('<notification xmlns="http://iperity.com/compass" xmlns:xsi="\n' +
     '       http://www.w3.org/2001/XMLSchema-instance" timestamp\n' +
     '       ="1492705754" type="notification.queue.destroy" xsi:type="\n' +
     '       queueDestroyNotification">\n' +
     '       <queueId>2</queueId>' +
     '</notification>',
-);
+).documentElement;
 const xmlQueueMemberLeaveNotification = $.parseXML('<notification xmlns="http://iperity.com/compass" xmlns:xsi="\n' +
     '       http://www.w3.org/2001/XMLSchema-instance" timestamp\n' +
     '       ="1492705754" type="notification.queueMember.leave" xsi:type="\n' +
@@ -383,7 +379,7 @@ const xmlQueueMemberLeaveNotification = $.parseXML('<notification xmlns="http://
     '           <priority>1</priority>' +
     '       </member>' +
     '</notification>',
-);
+).documentElement;
 const xmlQueueMemberEnterNotification = $.parseXML('<notification xmlns="http://iperity.com/compass" xmlns:xsi="\n' +
     '       http://www.w3.org/2001/XMLSchema-instance" timestamp\n' +
     '       ="1492705754" type="notification.queueMember.enter" xsi:type="\n' +
@@ -394,7 +390,7 @@ const xmlQueueMemberEnterNotification = $.parseXML('<notification xmlns="http://
     '           <priority>1</priority>' +
     '       </member>' +
     '</notification>',
-);
+).documentElement;
 const xmlQueueMemberPauseNotification = $.parseXML('<notification xmlns="http://iperity.com/compass" xmlns:xsi="\n' +
     '       http://www.w3.org/2001/XMLSchema-instance" timestamp\n' +
     '       ="1492705754" type="notification.queueMember.update" xsi:type="\n' +
@@ -406,7 +402,7 @@ const xmlQueueMemberPauseNotification = $.parseXML('<notification xmlns="http://
     '           <pausedSince>1337295600000</pausedSince>' +
     '       </member>' +
     '</notification>',
-);
+).documentElement;
 const xmlQueueMemberUnpauseNotification = $.parseXML('<notification xmlns="http://iperity.com/compass" xmlns:xsi="\n' +
     '       http://www.w3.org/2001/XMLSchema-instance" timestamp\n' +
     '       ="1492705754" type="notification.queueMember.update" xsi:type="\n' +
@@ -418,13 +414,13 @@ const xmlQueueMemberUnpauseNotification = $.parseXML('<notification xmlns="http:
     '           <pausedSince>0</pausedSince>' +
     '       </member>' +
     '</notification>',
-);
+).documentElement;
 
 // Tests
 
 describe('XmppHandler :: Company', () => {
     it('getCompany', () => {
-        const xmlCompany = $(xmlGetCompanyResult).find('>result');
+        const xmlCompany = $(xmlGetCompanyResult);
 
         const xmppHandler = getEmptyXmppHandler();
         xmppHandler.setCompanyFromXmpp(xmlCompany);
@@ -436,7 +432,7 @@ describe('XmppHandler :: Company', () => {
 describe('XmppHandler :: User', () => {
     it('getUsers', () => {
 
-        const xmlUsers = $(xmlGetUsersResult).find('>result').children();
+        const xmlUsers = $(xmlGetUsersResult).children();
 
         const xmppHandler = getEmptyXmppHandler();
         const model = xmppHandler.model;
@@ -453,7 +449,7 @@ describe('XmppHandler :: User', () => {
         const model = xmppHandler.model;
 
         // Create user
-        const xmlNotification = $(xmlCreateUserNotification).children();
+        const xmlNotification = $(xmlCreateUserNotification);
         xmppHandler.handleNotification(xmlNotification);
         const userId = '8323556';
         const user = model.users[userId];
@@ -476,7 +472,7 @@ describe('XmppHandler :: User', () => {
     });
 
     it('notification.user.create', () => {
-        const xmlNotification = $(xmlCreateUserNotification).children();
+        const xmlNotification = $(xmlCreateUserNotification);
 
         const xmppHandler = getEmptyXmppHandler();
         const model = xmppHandler.model;
@@ -497,7 +493,7 @@ describe('XmppHandler :: User', () => {
         const model = xmppHandler.model;
 
         // Create user
-        const xmlNotification = $(xmlCreateUserNotification).children();
+        const xmlNotification = $(xmlCreateUserNotification);
         xmppHandler.handleNotification(xmlNotification);
         const userId = '8323556';
 
@@ -511,7 +507,7 @@ describe('XmppHandler :: User', () => {
         });
 
         // Update user
-        xmppHandler.handleNotification($(xmlUpdateUserNotification).children());
+        xmppHandler.handleNotification($(xmlUpdateUserNotification));
         // Check
         expect(eventReceived).equals(true);
         expect(model.users["8323556"].name).equals('Tijs Testuser');
@@ -522,7 +518,7 @@ describe('XmppHandler :: User', () => {
         const model = xmppHandler.model;
 
         // Create user
-        const xmlNotification = $(xmlCreateUserNotification).children();
+        const xmlNotification = $(xmlCreateUserNotification);
         xmppHandler.handleNotification(xmlNotification);
         const userId = '8323556';
         const user = model.users[userId];
@@ -537,7 +533,7 @@ describe('XmppHandler :: User', () => {
         });
 
         // handle user removed notification
-        xmppHandler.handleNotification($(xmlDestroyUserNotification).children());
+        xmppHandler.handleNotification($(xmlDestroyUserNotification));
 
         // Check
         expect(model.users[userId]).to.be.undefined;
@@ -555,8 +551,8 @@ describe('XmppHandler :: Call', () => {
     const model = xmppHandler.model;
 
     // add data
-    xmppHandler.handleNotification($(xmlCreateQueueNotification).children());
-    xmppHandler.handleNotification($(xmlCreateUserNotification).children());
+    xmppHandler.handleNotification($(xmlCreateQueueNotification));
+    xmppHandler.handleNotification($(xmlCreateUserNotification));
     const user = model.users[userId];
 
     let newCall: Call;
@@ -575,7 +571,7 @@ describe('XmppHandler :: Call', () => {
     it('getCalls', () => {
 
         // process getCalls response.
-        const xmlCalls = $(xmlGetCallsResult).find('>result').children();
+        const xmlCalls = $(xmlGetCallsResult).children();
         xmppHandler.setCallsFromXmpp(xmlCalls);
 
         expect(model.calls[callId1]).to.not.be.undefined;
@@ -589,7 +585,7 @@ describe('XmppHandler :: Call', () => {
             eventReceived = true;
         });
 
-        const xmlNotification = $(xmlCallStartNotification).children();
+        const xmlNotification = $(xmlCallStartNotification);
         xmppHandler.handleNotification(xmlNotification);
         subscription.unsubscribe();
 
@@ -639,7 +635,7 @@ describe('XmppHandler :: Call', () => {
         });
 
         // Process notification
-        const xmlNotification = $(xmlCallUpdateSourceNotification).children();
+        const xmlNotification = $(xmlCallUpdateSourceNotification);
         xmppHandler.handleNotification(xmlNotification);
 
         subscription1.unsubscribe();
@@ -678,7 +674,7 @@ describe('XmppHandler :: Call', () => {
         });
 
         // Process notification
-        const xmlNotification = $(xmlCallUpdateDestinationNotification).children();
+        const xmlNotification = $(xmlCallUpdateDestinationNotification);
         xmppHandler.handleNotification(xmlNotification);
 
         subscription1.unsubscribe();
@@ -693,7 +689,7 @@ describe('XmppHandler :: Call', () => {
     it('notification.call.update (destination = queue)', () => {
 
         // Process notification
-        const xmlNotification = $(xmlCallUpdateDestinationQueueNotification).children();
+        const xmlNotification = $(xmlCallUpdateDestinationQueueNotification);
         xmppHandler.handleNotification(xmlNotification);
 
         // Call events: user removed, queue added, call changed
@@ -729,7 +725,7 @@ describe('XmppHandler :: Call', () => {
     it('notification.call.update (state = ringing)', () => {
 
         // Process notification
-        const xmlNotification = $(xmlCallUpdateStateNotification).children();
+        const xmlNotification = $(xmlCallUpdateStateNotification);
         xmppHandler.handleNotification(xmlNotification);
 
         // Call events: call-state changed + callpoint state changed
@@ -746,7 +742,7 @@ describe('XmppHandler :: Call', () => {
 
     it('notification.call.end', () => {
 
-        const xmlNotificationCallEnd = $(xmlCallEndNotification).children();
+        const xmlNotificationCallEnd = $(xmlCallEndNotification);
         xmppHandler.handleNotification(xmlNotificationCallEnd);
 
         // Call events
@@ -790,11 +786,11 @@ describe('XmppHandler :: Queue', () => {
     it('getQueues', () => {
 
         // Add a user first
-        const xmlNotification = $(xmlCreateUserNotification).children();
+        const xmlNotification = $(xmlCreateUserNotification);
         xmppHandler.handleNotification(xmlNotification);
 
         // Queue
-        const xmlQueues = $(xmlGetQueuesResult).find('>result').children();
+        const xmlQueues = $(xmlGetQueuesResult).children();
 
         xmppHandler.setQueuesFromXmpp(xmlQueues);
         expect(model.queues[queueId]).to.not.be.undefined;
@@ -809,7 +805,7 @@ describe('XmppHandler :: Queue', () => {
             eventReceived = true;
         });
 
-        const xmlNotification = $(xmlQueueCallEnterNotification).children();
+        const xmlNotification = $(xmlQueueCallEnterNotification);
         xmppHandler.handleNotification(xmlNotification);
         subscription.unsubscribe();
 
@@ -824,7 +820,7 @@ describe('XmppHandler :: Queue', () => {
             eventReceived = true;
         });
 
-        const xmlNotification = $(xmlQueueCallLeaveNotification).children();
+        const xmlNotification = $(xmlQueueCallLeaveNotification);
         xmppHandler.handleNotification(xmlNotification);
         subscription.unsubscribe();
 
@@ -844,7 +840,7 @@ describe('XmppHandler :: Queue', () => {
             }
         });
 
-        const xmlNotification = $(xmlQueueUpdateNotification).children();
+        const xmlNotification = $(xmlQueueUpdateNotification);
         xmppHandler.handleNotification(xmlNotification);
         subscription.unsubscribe();
 
@@ -859,7 +855,7 @@ describe('XmppHandler :: Queue', () => {
             event = e;
         });
 
-        xmppHandler.handleNotification($(xmlCreateQueueNotification).children());
+        xmppHandler.handleNotification($(xmlCreateQueueNotification));
 
         expect(event).is.not.undefined;
         expect(event.eventType).equals(EventType.Added);
@@ -881,7 +877,7 @@ describe('XmppHandler :: Queue', () => {
             }
         });
 
-        const xmlNotification = $(xmlQueueMemberLeaveNotification).children();
+        const xmlNotification = $(xmlQueueMemberLeaveNotification);
         xmppHandler.handleNotification(xmlNotification);
         subscription.unsubscribe();
 
@@ -901,7 +897,7 @@ describe('XmppHandler :: Queue', () => {
             }
         });
 
-        const xmlNotification = $(xmlQueueMemberEnterNotification).children();
+        const xmlNotification = $(xmlQueueMemberEnterNotification);
         xmppHandler.handleNotification(xmlNotification);
         subscription.unsubscribe();
 
@@ -925,7 +921,7 @@ describe('XmppHandler :: Queue', () => {
 
         expect(queue.isUserPausedInQueue(userId)).equals(false);
 
-        const xmlNotification = $(xmlQueueMemberPauseNotification).children();
+        const xmlNotification = $(xmlQueueMemberPauseNotification);
         xmppHandler.handleNotification(xmlNotification);
         subscription.unsubscribe();
 
@@ -950,7 +946,7 @@ describe('XmppHandler :: Queue', () => {
 
         expect(queue.isUserPausedInQueue(userId)).equals(true);
 
-        const xmlNotification = $(xmlQueueMemberUnpauseNotification).children();
+        const xmlNotification = $(xmlQueueMemberUnpauseNotification);
         xmppHandler.handleNotification(xmlNotification);
         subscription.unsubscribe();
 
@@ -961,7 +957,7 @@ describe('XmppHandler :: Queue', () => {
     it('notification.queue.destroy', () => {
 
         // Create queue
-        xmppHandler.handleNotification($(xmlCreateQueueNotification).children());
+        xmppHandler.handleNotification($(xmlCreateQueueNotification));
         const newQueueId = 2;
 
         const queue = model.queues[newQueueId];
@@ -977,7 +973,7 @@ describe('XmppHandler :: Queue', () => {
 
 
         expect(model.queues[2]).is.not.undefined;
-        xmppHandler.handleNotification($(xmlQueueDestroyNotification).children());
+        xmppHandler.handleNotification($(xmlQueueDestroyNotification));
         subscription.unsubscribe();
         expect(model.queues[2]).is.undefined;
 
@@ -994,6 +990,7 @@ describe('XmppHandler :: Queue', () => {
         expect(model.queues[queueId]).is.not.undefined;
         xmppHandler.removeQueue(queueId);
         expect(model.queues[queueId]).is.undefined;
+
 
         expect(event).is.not.undefined;
         expect(event.eventType).equals(EventType.Removed);

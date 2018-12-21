@@ -19,8 +19,9 @@ import {
     User,
     UserCallPoint,
 } from "./Model";
-import Model from "./Model";
-import compassLogger from "./Logging";
+import {Model} from "./Model";
+import {compassLogger} from "./Logging";
+import * as $ from "jquery";
 
 // ============================ Registry ============================
 

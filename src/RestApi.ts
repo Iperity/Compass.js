@@ -1,5 +1,6 @@
 import Promise = JQuery.Promise;
-import compassLogger from "./Logging";
+import {compassLogger} from "./Logging";
+import * as $ from "jquery";
 
 const CONTENT_TYPE = 'application/vnd.iperity.compass.v2+json';
 
@@ -8,7 +9,7 @@ const CONTENT_TYPE = 'application/vnd.iperity.compass.v2+json';
  *
  * To obtain an instance, use the 'restApi' member of the connection.
  */
-export default class RestApi {
+export class RestApi {
 
     /**
      * The authentication header to include in every rest-request.
