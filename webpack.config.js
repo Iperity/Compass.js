@@ -48,7 +48,17 @@ module.exports = {
 
 // externalize dependencies
 module.exports.externals = [
-    { jquery: 'jquery' },
+    {
+        jquery: {
+            commonjs: 'jquery',
+            commonjs2: 'jquery',
+            amd: 'jquery',
+            /* jquery defines itself with a global variable
+               with capital Q
+             */
+            root: 'jQuery'
+        }
+    },
     webpackRxjsExternals(),
     webpackStropheExternals,
     'strophejs-plugin-pubsub'
