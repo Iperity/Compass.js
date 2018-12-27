@@ -1,4 +1,3 @@
-import Promise = JQuery.Promise;
 import {compassLogger} from "./Logging";
 import * as $ from "jquery";
 
@@ -100,7 +99,7 @@ export class RestApi {
         promise.fail( (result, err) => {
             compassLogger.warn(`REST ${method} request to ${url} with data ${JSON.stringify(data) } failed with error: ${err}`);
         });
-        return promise;
+        return Promise.resolve(promise);
     }
 
     /**
