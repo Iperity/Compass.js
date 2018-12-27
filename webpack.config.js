@@ -8,7 +8,7 @@ module.exports = {
     entry: './src/Compass.ts',
     output: {
         filename: 'Compass.js',
-        library: 'compass.js',
+        library: 'compass',
         path: path.resolve(__dirname, 'build'),
         libraryTarget: 'umd'
     },

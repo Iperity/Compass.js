@@ -4,7 +4,7 @@ if (typeof config === 'undefined') {
 }
 
 // Create the connection, and connect.
-const conn  = new Compass.Connection(config.basedom);
+const conn  = new compass.Connection(config.basedom);
 
 // For debugging:
 // Compass.compassLogger.setLevel(Compass.compassLogger.levels.DEBUG);
