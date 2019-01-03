@@ -482,19 +482,28 @@ class XmppNotificationHandler {
 
         const type = not.attr('type');
         const userId = not.find('>userId').text();
+        
+        if (type === 'notification.user.create') {
+            // user should *not* exist
+            if (this._xmppHandler.model.users[userId]) {
+                compassLogger.warn(`Received ${type} for ${userId}, but user with that userId already exists.`);
+                return;
+            }
+            const userElem = not.find(">user");
+            const userFromNotification = this._parser.parse(userElem, ObjectType.User) as User;
+            this._xmppHandler.addUser(userFromNotification, true);
+            return;
+        }
+        
+        // for all other user-related notifications, the user must exist
+        const user = this._xmppHandler.model.users[userId];
+        if (!user) {
+            compassLogger.warn(`Received ${type} for ${userId}, but user with that userId does not exists.`);
+            return;
+        }
 
         switch (type) {
-            case 'notification.user.create':
-                if (this._xmppHandler.model.users[userId]) {
-                    compassLogger.warn(`Received ${type} for ${userId}, but user with that userId already exists.`);
-                    return;
-                }
-                const userElem = not.find(">user");
-                const userFromNotification = this._parser.parse(userElem, ObjectType.User) as User;
-                this._xmppHandler.addUser(userFromNotification, true);
-                break;
             case 'notification.user.update':
-                const user = this._xmppHandler.model.users[userId];
                 this.handlePropertiesChanged(user, not.find('>propertyChange'), this.handleUserPropertyUpdate);
                 break;
             case 'notification.user.destroy':
