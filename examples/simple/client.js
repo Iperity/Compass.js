@@ -7,7 +7,7 @@ if (typeof config === 'undefined') {
 const conn  = new compass.Connection(config.basedom);
 
 // For debugging:
-// Compass.compassLogger.setLevel(Compass.compassLogger.levels.DEBUG);
+// compass.compassLogger.setLevel(compass.compassLogger.levels.DEBUG);
 // conn.logXmpp = true;
 
 const promise = conn.connect(config.jid, config.password);
@@ -28,7 +28,7 @@ promise.then(function () {
     // Listen to the userList
     conn.model.usersObservable.subscribe(event => {
         console.log(`User ${event.emitter.name} (${event.emitter.id}) event: ${event.eventType}`);
-        if (event.eventType === Compass.EventType.PropertyChanged) {
+        if (event.eventType === compass.EventType.PropertyChanged) {
             logPropertyChanged(event);
         }
     });
@@ -36,7 +36,7 @@ promise.then(function () {
     // Listen to the queue-list
     conn.model.queuesObservable.subscribe(event => {
         console.log(`Queue ${event.emitter.name} (${event.emitter.id}) event: ${event.eventType}`);
-        if (event.eventType === Compass.EventType.PropertyChanged) {
+        if (event.eventType === compass.EventType.PropertyChanged) {
             logPropertyChanged(event);
         }
     });
@@ -45,7 +45,7 @@ promise.then(function () {
     conn.model.callsObservable.subscribe(event => {
         console.log(`Call ${event.emitter.id} event: ${event.eventType}`);
         switch (event.eventType) {
-            case Compass.EventType.Changed:
+            case compass.EventType.Changed:
                 let details = '';
                 switch (event.data.updateType) {
                     case 'source':
@@ -63,7 +63,7 @@ promise.then(function () {
                 }
                 console.log(`... ${details}`);
                 break;
-            case Compass.EventType.PropertyChanged:
+            case compass.EventType.PropertyChanged:
                 logPropertyChanged(event);
                 break;
         }
