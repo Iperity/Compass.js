@@ -16,4 +16,6 @@ Examples
     Manually create a config file before using.
 * simple-nodejs - A demonstration on how to connect to Compass using a Node.js script; No user interface.
     Manually create a config file before using.
+* simple-typescript - An example of a Typescript app using Compass.js (with webpack)
+    Manually create a config file before using.
 * queues - a simple jQuery-based application to show a queue overview for your company
