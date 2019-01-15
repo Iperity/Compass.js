@@ -8,7 +8,7 @@ module.exports = {
     entry: './src/Compass.ts',
     output: {
         filename: 'Compass.js',
-        library: 'compass.js',
+        library: 'compass',
         path: path.resolve(__dirname, 'build'),
         libraryTarget: 'umd'
     },
@@ -48,7 +48,17 @@ module.exports = {
 
 // externalize dependencies
 module.exports.externals = [
-    { jquery: 'jquery' },
+    {
+        jquery: {
+            commonjs: 'jquery',
+            commonjs2: 'jquery',
+            amd: 'jquery',
+            /* jquery defines itself with a global variable
+               with capital Q
+             */
+            root: 'jQuery'
+        }
+    },
     webpackRxjsExternals(),
     webpackStropheExternals,
     'strophejs-plugin-pubsub'

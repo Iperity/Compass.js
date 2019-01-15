@@ -5,7 +5,7 @@ let api;
 let selfUser;
 
 // Troubleshooting:
-// Compass.compassLogger.setLevel('debug');
+// compass.compassLogger.setLevel('debug');
 
 log.setLevel('debug');
 
@@ -53,8 +53,7 @@ function login() {
         localStorage.removeItem('password');
     }
 
-    conn = new Compass.Connection(server);
-    //Compass.compassLogger.setLevel("debug");
+    conn = new compass.Connection(server);
     model = conn.model;
 
     // Setup logging and status messages.
@@ -134,11 +133,11 @@ function handleQueueEvent(event) {
     let elem = getQueueElement(queue);
 
     switch (event.eventType) {
-        case Compass.EventType.Added:
+        case compass.EventType.Added:
             addQueue(queue);
             break;
 
-        case Compass.EventType.Removed:
+        case compass.EventType.Removed:
             elem.remove();
             break;
 

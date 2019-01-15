@@ -39,7 +39,7 @@ In javaScript:
 
 * Create the 'connection' object
 ```javascript
-const conn  = new Compass.Connection("compass-basedomain.com");
+const conn  = new compass.Connection("compass-basedomain.com");
 ```
 * Connect
 ```javascript
@@ -60,9 +60,9 @@ Model
 All users, queues, and calls within the company are available on the `conn.model.users`, `conn.model.queues` and `conn.model.calls` objects respectively. All objects are accessible by their id.
 
 Moreover, events for these objects are published on the `conn.model.usersObservable`, `conn.model.queuesObservable` and `conn.model.callsObservable` RxJS observables. 
-These observables emit a stream of events of type *Compass.Event*.
+These observables emit a stream of events of type *compass.Event*.
 
-The *Compass.Event* object has the following properties:
+The *compass.Event* object has the following properties:
 * emitter - Which *Queue*, *Call*, or *Company* emitted this event. Can be *null* for global events.
 * eventType - What was the event type for this event?
 * data - Additional data for the event.
@@ -71,7 +71,7 @@ For a description of event types, see the [Events.ts file in the repository](./s
 
 For example: when a user logs into a queue, we will receive an event on the *conn.model.queueObservable* with the following properties:
 * emitter - The queue that the user logged on to.
-* eventType - *Compass.EventType.UserAdded* - because a user got added to a queue.
+* eventType - *compass.EventType.UserAdded* - because a user got added to a queue.
 * data - The user that logged on to the queue.
 
 As an example, we could log queue-events as following:
@@ -111,7 +111,7 @@ Logging
 By default, only `warn` level and higher log messages are logged to the JavaScript console. 
 The log-level van be changed to log level `debug` as following: 
 ```javascript
-Compass.compassLogger.setLevel(Compass.compassLogger.levels.DEBUG);
+compass.compassLogger.setLevel(compass.compassLogger.levels.DEBUG);
 ```
 
 After the log-level has been set to debug, all XMPP traffic can be logged as following:
