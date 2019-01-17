@@ -281,25 +281,17 @@ export class Connection {
         this.stropheConnection.send($pres().c('priority').t('1'));
     }
 
-    private _setInvisible(): Promise<JQuery> {
-        this.sendIQ($iq({
-            type : 'set',
-        }).c('query', {
-            xmlns : 'jabber:iq:privacy',
-        }).c('list', {
-            name : 'invisible',
-        }).c('item', {
-            action : 'deny',
-            order : '1',
-        }).c('presence-out', {}));
-
-        return this.sendIQ($iq({
-            type : 'set',
-        }).c('query', {
-            xmlns : 'jabber:iq:privacy',
-        }).c('active', {
-            name : 'invisible',
-        }));
+    private _setInvisible(): Promise<[JQuery, JQuery]> {
+        const createListIq = $iq({type : 'set'})
+            .c('query', {xmlns : 'jabber:iq:privacy'})
+            .c('list', {name : 'invisible'})
+            .c('item', {action : 'deny', order : '1'})
+            .c('presence-out', {});
+        const activateListIq = $iq({type : 'set'})
+            .c('query', {xmlns : 'jabber:iq:privacy'})
+            .c('active', {name : 'invisible'});
+        
+        return Promise.all([this.sendIQ(createListIq), this.sendIQ(activateListIq)]);
     }
 
     private _setupConnection(jid) {
