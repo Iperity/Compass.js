@@ -141,7 +141,29 @@ export enum CallPointType {
     user = "User",
     dialplan = "Dialplan",
     external = "External",
+    resource = "Resource",
     queue = "Queue",
+}
+
+/**
+ * Resource types
+ * (from resourceType ICE enum)
+ */
+export enum ResourceType {
+    conference = "conference",
+    extension = "extension",
+    forward = "forward",
+    ivr = "ivr",
+    musiconhold = "musiconhold",
+    nameprefix = "nameprefix",
+    phone = "phone",
+    voicemail = "voicemail",
+    dpswitch = "dpswitch",
+    externalNumber = "externalNumber",
+    input = "input",
+    
+    // unused, has custom mapping to QueueCallpoint
+    // queue = "queue",
 }
 
 /**
@@ -242,6 +264,8 @@ export class DialplanCallPoint extends CallPoint {
  */
 export class UserCallPoint extends CallPoint {
     public userId: string;
+    public userName: string;
+    public identityId: string;
 
     /**
      * Get the user that is part of the cool.
@@ -251,6 +275,18 @@ export class UserCallPoint extends CallPoint {
         return this.domain.users[this.userId];
     }
 }
+
+
+/**
+ * Class for objects representing a side of a call that is a resource.
+ * (but queues have their own QueueCallpoint type)
+ */
+export class ResourceCallPoint extends CallPoint {
+    public resourceType: string;
+    public resourceId: string;
+    public name: string;
+}
+
 
 /**
  * Class for objects representing a side of a call that is a call-queue.
