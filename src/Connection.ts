@@ -312,7 +312,7 @@ export class Connection {
         this.jid = jid;
 
         // Setup strophe connection
-        const bosh_service = `https://bosh.${this.basedom}/http-bind`;
+        const bosh_service = `wss://bosh.${this.basedom}/ws`;
         this.stropheConnection = new Strophe.Connection(bosh_service);
 
         if (this.logXmpp) {
