@@ -200,24 +200,22 @@ export class Connection {
         // set invisible, we don't want our user to get online
         // NOTE: wait for invisible to be ack'ed (iq result) before sending presence:
         // https://github.com/processone/ejabberd/issues/2652
-        this._setInvisible().then(() => {
-            this._sendInitialPresence();
+        return this._setInvisible().then(() => {
+            return this._sendInitialPresence();
+        }).then( () => {
+            // Get our company-id
+            return this._getCompany()
+                .catch((e) => {
+                    throw new Error("User has no company");
+                });
+        }).then((res) => {
+            this._xmppHandler.setCompanyFromXmpp(res.find('>result'));
+            // Subscribe to the pubsub-node where all mutations to the company data-model are published.
+            return this._subscribeToPubsub();
+        }).then(() => {
+            compassLogger.info('Pubsub subscribed');
+            return this._onSubscribed(password);
         });
-
-        // Get our company-id
-        return this._getCompany()
-            .then((res) => {
-                this._xmppHandler.setCompanyFromXmpp(res.find('>result'));
-                // Subscribe to the pubsub-node where all mutations to the company data-model are published.
-                return this._subscribeToPubsub()
-                    .then(() => {
-                        compassLogger.info('Pubsub subscribed');
-                        return this._onSubscribed(password);
-                    });
-            })
-            .catch((e) => {
-               throw new Error("User has no company");
-            });
     }
 
     /*
