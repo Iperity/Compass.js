@@ -16,6 +16,8 @@ import {
     Queue,
     QueueCallPoint,
     QueueMember,
+    ResourceCallPoint,
+    ResourceType,
     User,
     UserCallPoint,
 } from "./Model";
@@ -199,10 +201,23 @@ class UserCallPointParser implements ICallPointSubtypeParser {
     public parse(id: string, elem: JQuery, parserContext: ParserContext): CallPoint {
         const cp = new UserCallPoint(id, elem, parserContext.model);
         cp.userId = elem.find('>userId').text();
+        cp.userName = elem.find('>userName').text();
+        cp.identityId = elem.find('>identityId').text();
         return cp;
     }
 }
 CallPointParser.register(new UserCallPointParser(), CallPointType.user);
+
+class ResourceCallPointParser implements ICallPointSubtypeParser {
+    public parse(id: string, elem: JQuery, parserContext: ParserContext): CallPoint {
+        const cp = new ResourceCallPoint(id, elem, parserContext.model);
+        cp.resourceType = elem.find('>resourceType').text() as ResourceType;
+        cp.resourceId = elem.find('>resourceId').text();
+        cp.name = elem.find('>name').text();
+        return cp;
+    }
+}
+CallPointParser.register(new ResourceCallPointParser(), CallPointType.resource);
 
 class QueueCallPointParser implements ICallPointSubtypeParser {
     public parse(id: string, elem: JQuery, parserContext: ParserContext): CallPoint {
