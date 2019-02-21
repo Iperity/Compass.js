@@ -202,7 +202,7 @@ export class Connection {
         // https://github.com/processone/ejabberd/issues/2652
         return this._setInvisible().then(() => {
             return this._sendInitialPresence();
-        }).then( () => {
+        }).then(() => {
             // Get our company-id
             return this._getCompany()
                 .catch((e) => {
