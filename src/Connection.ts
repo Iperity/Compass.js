@@ -105,10 +105,11 @@ export class Connection {
     }
 
     /**
-     * Send IQ message and return result XML as jQuery object.
+     * Send IQ message. Returns a Promise that resolves with the
+     * IQ result element (as JQuery object).
      *
-     * @param {Element | Strophe.Builder} iq
-     * @returns {Promise<JQuery>}
+     * @param iq the IQ message, as jQuery element or as Strophe builder
+     * @returns a promise that resolves with the IQ result as jQuery element
      */
     public sendIQ(iq: Element | Builder): Promise<JQuery> {
         return new Promise<JQuery>((resolve, reject) => {
@@ -197,23 +198,24 @@ export class Connection {
 
     private _onConnected(password: string): Promise<void[]> {
         // set invisible, we don't want our user to get online
-        this._setInvisible();
-        this._sendInitialPresence();
-
-        // Get our company-id
-        return this._getCompany()
-            .then((res) => {
-                this._xmppHandler.setCompanyFromXmpp(res.find('>result'));
-                // Subscribe to the pubsub-node where all mutations to the company data-model are published.
-                return this._subscribeToPubsub()
-                    .then(() => {
-                        compassLogger.info('Pubsub subscribed');
-                        return this._onSubscribed(password);
-                    });
-            })
-            .catch((e) => {
-               throw new Error("User has no company");
-            });
+        // NOTE: wait for invisible to be ack'ed (iq result) before sending presence:
+        // https://github.com/processone/ejabberd/issues/2652
+        return this._setInvisible().then(() => {
+            return this._sendInitialPresence();
+        }).then(() => {
+            // Get our company-id
+            return this._getCompany()
+                .catch((e) => {
+                    throw new Error("User has no company");
+                });
+        }).then((res) => {
+            this._xmppHandler.setCompanyFromXmpp(res.find('>result'));
+            // Subscribe to the pubsub-node where all mutations to the company data-model are published.
+            return this._subscribeToPubsub();
+        }).then(() => {
+            compassLogger.info('Pubsub subscribed');
+            return this._onSubscribed(password);
+        });
     }
 
     /*
@@ -277,25 +279,17 @@ export class Connection {
         this.stropheConnection.send($pres().c('priority').t('1'));
     }
 
-    private _setInvisible() {
-        this.stropheConnection.sendIQ($iq({
-            type : 'set',
-        }).c('query', {
-            xmlns : 'jabber:iq:privacy',
-        }).c('list', {
-            name : 'invisible',
-        }).c('item', {
-            action : 'deny',
-            order : '1',
-        }).c('presence-out', {}));
-
-        this.stropheConnection.sendIQ($iq({
-            type : 'set',
-        }).c('query', {
-            xmlns : 'jabber:iq:privacy',
-        }).c('active', {
-            name : 'invisible',
-        }));
+    private _setInvisible(): Promise<[JQuery, JQuery]> {
+        const createListIq = $iq({type : 'set'})
+            .c('query', {xmlns : 'jabber:iq:privacy'})
+            .c('list', {name : 'invisible'})
+            .c('item', {action : 'deny', order : '1'})
+            .c('presence-out', {});
+        const activateListIq = $iq({type : 'set'})
+            .c('query', {xmlns : 'jabber:iq:privacy'})
+            .c('active', {name : 'invisible'});
+        
+        return Promise.all([this.sendIQ(createListIq), this.sendIQ(activateListIq)]);
     }
 
     private _setupConnection(jid) {
