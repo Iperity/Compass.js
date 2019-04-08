@@ -123,6 +123,20 @@ export class Connection {
         });
     }
 
+    /**
+     * Disconnect and complete the model observables.
+     * 
+     * This Connection instance should not be used afterwards;
+     * for a new connection, create a new instance.
+     * 
+     */
+    public disconnect() {
+        // we'll get a warning in the console;
+        // https://github.com/strophe/strophejs/issues/291
+        this.stropheConnection.disconnect();
+        this.model.clear();
+    }
+
     // private methods
 
     private _internalConnect(jid, password, resource?): Promise<void> {

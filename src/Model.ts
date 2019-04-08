@@ -644,6 +644,17 @@ export class Model {
         }
     }
 
+    public clear() {
+        this.calls = {};
+        this.callsSubject.complete();
+        
+        this.users = {};
+        this.usersSubject.complete();
+        
+        this.queues = {};
+        this.queuesSubject.complete();
+    }
+
     // privates
 
     private usersSubject: Subject<Event> = new Subject();

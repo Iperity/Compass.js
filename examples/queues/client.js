@@ -101,6 +101,8 @@ function gotModel() {
     selfUser = model.getUserForJid(conn.jid);
 
     // Show interface
+    $('#login_container').show();
+    $('#loading').hide();
     $('#login').hide();
     $('#container').show();
 
@@ -109,7 +111,10 @@ function gotModel() {
         addQueue(model.queues[queueId]);
     }
 
-    model.queuesObservable.subscribe(event => handleQueueEvent(event));
+    model.queuesObservable.subscribe(
+        event => handleQueueEvent(event),
+        null,
+        () => log.info("Observable has completed"));
 }
 
 function getQueueElement(queue) {
@@ -195,4 +200,13 @@ function logonQueue(queue) {
             callForward: false,
         });
     }
+}
+
+function disconnect() {
+    conn.disconnect();
+
+    $('#login').show();
+    $('#login_error').hide();
+    $('#container').hide();
+    $('#queue-list').empty();
 }
