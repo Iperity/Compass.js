@@ -219,6 +219,11 @@ h6 {
     margin: 0 3rem;
 }
 
+#disconnect {
+    display: flex;
+    justify-content: center;
+}
+
 .queue_block {
     background-color: #ffffff;
     margin: 1.5rem;

@@ -123,6 +123,21 @@ export class Connection {
         });
     }
 
+    /**
+     * Disconnect and complete the model observables.
+     * 
+     * This Connection instance should not be used afterwards;
+     * for a new connection, create a new instance.
+     * 
+     */
+    public disconnect() {
+        this._autoReconnectHandler.stop();
+        // we'll get a warning in the console;
+        // https://github.com/strophe/strophejs/issues/291
+        this.stropheConnection.disconnect();
+        this.model.clear();
+    }
+
     // private methods
 
     private _internalConnect(jid, password, resource?): Promise<void> {
@@ -414,6 +429,15 @@ class AutoReconnectHandler {
 
         compassLogger.debug(`Starting XMPP ping every ${this._pingIntervalMs / 1000}s, will re-connect automatically if no response within ${this._pingTimeoutMs / 1000}s.`);
         this._pingTimer = setInterval(() => this.doPing(), this._pingIntervalMs);
+    }
+    
+    public stop() {
+        clearInterval(this._pingTimer);
+        this._pingTimer = undefined;
+        if (this._pingTimeoutTimer) {
+            clearTimeout(this._pingTimeoutTimer);
+            this._pingTimeoutTimer = undefined;
+        }
     }
 
     private doPing() {
