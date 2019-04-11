@@ -76,6 +76,12 @@ describe('Model :: Callpoint', () => {
         cp.timeStarted = 200;
         expect(cp.getAnsweredDuration() < cp.getDuration()).is.true;
         expect(cp.getAnsweredDuration() > 200).is.true;
+        
+        cp.timeCreated = +new Date() / 1000 + 3600;
+        expect(cp.getDuration()).equals(0);
+
+        cp.timeStarted = +new Date() / 1000 + 3600;
+        expect(cp.getAnsweredDuration()).equals(0);
     });
 });
 
