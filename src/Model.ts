@@ -674,5 +674,11 @@ function getDurationFrom(startSec: number) {
     }
     
     const endSec = (new Date().getTime()) / 1000;
-    return endSec - startSec;
+    const duration = endSec - startSec;
+    // prevent negative durations
+    // for cases when user's device time preferences is wrong
+    if (duration < 0) {
+        return 0;
+    }
+    return duration;
 }
