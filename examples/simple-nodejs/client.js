@@ -1,15 +1,10 @@
-// Get a jQuery with a simulated 'window' object, and get jQuery in the global namespace.
-const jsdom = require("jsdom");
-const { JSDOM } = jsdom;
-const { window } = (new JSDOM());
-const $ = require('jquery')(window);
+// Load required libraries and setup DOM-like environment
 require('jsdom-global')();
-global.$ = $;
-
-// Load required libraries
 require('strophe.js');
 require("strophejs-plugin-pubsub");
-const rxjs = require("rxjs");
+require("rxjs");
+global.WebSocket = require('ws');
+global.DOMParser = window.DOMParser;
 const Compass = require("compass.js");
 
 // Load the config (copy from config-example.js and fill out your own credentials)
@@ -28,6 +23,12 @@ const promise = conn.connect(config.jid, config.password);
 // We are connected and all data-models have been retrieved.
 promise.then(function () {
     console.log("Connected!");
+    process.exit(0);
+});
+
+promise.catch(function(e) {
+    console.log(e);
+    process.exit(1);
 });
 
 // See the examples/simple example for more information on what to do once connected.

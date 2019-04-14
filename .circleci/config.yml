@@ -1,40 +1,147 @@
-# Javascript Node CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-javascript/ for more details
-#
-version: 2
+version: 2.1
+vars:
+  - &test_username compassjs-ci-user
+  - &test_basedom apollo.compass-stack.com
+  - credentials_env: &credentials_env
+    - USERNAME: *test_username
+    - BASEDOM: *test_basedom
+
+defaults: &defaults
+  working_directory: ~/project
+  docker:
+    # LTS node image
+    - image: circleci/node:10.15.0
+      environment: *credentials_env
+
 jobs:
   build:
-    docker:
-      # LTS node image
-      - image: circleci/node:10.15.0
-
-    working_directory: ~/repo
-
+    <<: *defaults
     steps:
       - checkout
-
       - restore_cache:
           name: Restore node modules cache
           keys:
           - node_modules-{{ checksum "package-lock.json" }}
           # fallback to using the latest cache if no exact match is found
           - node_modules-
-
       - run:
           name: Install dependencies
           command: npm install
-
       - save_cache:
           name: Save node modules cache
           paths:
             - node_modules
           key: node_modules-{{ checksum "package-lock.json" }}
-
       - run:
           name: Build
           command: NODE_ENV=production npm run-script build-ci
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project
 
+  test:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/
       - run:
           name: Test
           command: npm test
+
+  example-nodejs:
+    <<: *defaults
+    working_directory: ~/project/examples/simple-nodejs
+    steps:
+      - attach_workspace:
+          at: ~/
+      - restore_cache:
+          name: Restore node modules cache
+          keys:
+            - node_modules_examples_nodejs-{{ checksum "package-lock.json" }}
+            # fallback to using the latest cache if no exact match is found
+            - node_modules_examples_nodejs-
+      - run:
+          name: Install dependencies
+          command: npm install
+      - save_cache:
+          name: Save node modules cache
+          paths:
+            - node_modules
+          key: node_modules_examples_nodejs-{{ checksum "package-lock.json" }}
+      - run:
+          name: Setup CompassJS
+          command: (cd ../.. && sudo npm link) && npm link compass.js
+      - run:
+          name: Create config
+          environment: *credentials_env
+          command: "echo \"const config = { basedom: '$BASEDOM', jid: '$USERNAME@uc.$BASEDOM', password: '$CI_USER_PASSWORD' }; module.exports = config;\" > config.js"
+      - run:
+          name: Run
+          command: node client.js
+
+  example-typescript:
+    <<: *defaults
+    working_directory: ~/project/examples/simple-typescript
+    steps:
+      - attach_workspace:
+          at: ~/
+      - restore_cache:
+          name: Restore node modules cache
+          keys:
+            - node_modules_examples_typescript-{{ checksum "package.json" }}
+            # fallback to using the latest cache if no exact match is found
+            - node_modules_examples_typescript-
+      - run:
+          name: Install dependencies
+          command: npm install
+      - save_cache:
+          name: Save node modules cache
+          paths:
+            - node_modules
+          key: node_modules_examples_typescript-{{ checksum "package.json" }}
+      - run:
+          name: Build
+          command: npm run-script build
+
+  example-webpack:
+    <<: *defaults
+    working_directory: ~/project/examples/simple-webpack
+    steps:
+      - attach_workspace:
+          at: ~/
+      - restore_cache:
+          name: Restore node modules cache
+          keys:
+            - node_modules_examples_webpack-{{ checksum "package.json" }}
+            # fallback to using the latest cache if no exact match is found
+            - node_modules_examples_webpack-
+      - run:
+          name: Install dependencies
+          command: npm install
+      - save_cache:
+          name: Save node modules cache
+          paths:
+            - node_modules
+          key: node_modules_examples_webpack-{{ checksum "package.json" }}
+      - run:
+          name: Build
+          command: pwd && NODE_DEBUG=module npm run-script build
+
+workflows:
+  version: 2
+  ci:
+    jobs:
+      - build
+      - test:
+          requires:
+            - build
+      - example-nodejs:
+          requires:
+            - build
+      - example-typescript:
+          requires:
+          - build
+      - example-webpack:
+          requires:
+          - build
