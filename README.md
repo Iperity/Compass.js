@@ -129,6 +129,18 @@ To build the library:
 * run `npm install`
 * run `npm run-script build`
 
+Publishing
+---------
+* If not done so already: Increase version-number in package.json
+* `git tag <version-number>`
+* `git push origin <version-number>`
+* create a release from this tag on github.
+* `npm run-script build`
+* `npm test`
+* `npm publish`
+
+If you haven't logged on to the npm cli yet, it will prompt you to do so when running the last step.
+
  
 Documentation & Examples
 ---------
