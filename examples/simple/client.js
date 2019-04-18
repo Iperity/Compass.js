@@ -1,10 +1,13 @@
+import * as Compass from "compass.js";
+
+
 if (typeof config === 'undefined') {
     let elem = document.getElementById('main');
     elem.innerHTML = "ERROR: No config.js file found!<br/>Create the file by copying config-example.js";
 }
 
 // Create the connection, and connect.
-const conn  = new compass.Connection(config.basedom);
+const conn  = new Compass.Connection(config.basedom);
 
 // For debugging:
 // compass.compassLogger.setLevel(compass.compassLogger.levels.DEBUG);
