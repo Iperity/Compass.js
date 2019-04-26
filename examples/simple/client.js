@@ -27,6 +27,8 @@ promise.then(function () {
 
     // Listen to the userList
     conn.model.usersObservable.subscribe(event => {
+        if (!event.emitter) return; // reconnect events
+
         console.log(`User ${event.emitter.name} (${event.emitter.id}) event: ${event.eventType}`);
         if (event.eventType === compass.EventType.PropertyChanged) {
             logPropertyChanged(event);
@@ -35,6 +37,8 @@ promise.then(function () {
 
     // Listen to the queue-list
     conn.model.queuesObservable.subscribe(event => {
+        if (!event.emitter) return; // reconnect events
+
         console.log(`Queue ${event.emitter.name} (${event.emitter.id}) event: ${event.eventType}`);
         if (event.eventType === compass.EventType.PropertyChanged) {
             logPropertyChanged(event);
@@ -43,6 +47,8 @@ promise.then(function () {
 
     // Listen to the call-list
     conn.model.callsObservable.subscribe(event => {
+        if (!event.emitter) return; // reconnect events
+
         console.log(`Call ${event.emitter.id} event: ${event.eventType}`);
         switch (event.eventType) {
             case compass.EventType.Changed:
