@@ -70,6 +70,7 @@ export class Connection {
     private _domain: string;
     private _xmppHandler: XmppHandler;
     private _autoReconnectHandler: AutoReconnectHandler;
+    private _closed: boolean = false;
 
     /**
      * Create the connection to the Compass platform.
@@ -94,6 +95,8 @@ export class Connection {
      * @returns {Promise<void>} - Promise that resolves when the library is initialized. Don't try to get the model before that.
      */
     public connect(jid, password): Promise<void> {
+        this._closed = false;
+
         const promise = this._internalConnect(jid, password);
         promise.then(() => {
             // We just received a whole new model. Send 'invalidated' events on user, queue, and calls model.
@@ -124,13 +127,24 @@ export class Connection {
     }
 
     /**
+     * Close the connection. It can be re-opened using connect.
+     */
+    public close() {
+        this._closed = true;
+        this._autoReconnectHandler.stop();
+        this.stropheConnection.disconnect();
+        this.stropheConnection.reset();
+    }
+
+    /**
      * Disconnect and complete the model observables.
-     * 
+     *
      * This Connection instance should not be used afterwards;
      * for a new connection, create a new instance.
-     * 
+     *
      */
     public disconnect() {
+        this._closed = true;
         this._autoReconnectHandler.stop();
         // we'll get a warning in the console;
         // https://github.com/strophe/strophejs/issues/291
@@ -185,6 +199,9 @@ export class Connection {
 
                     case Strophe.Status.DISCONNECTED:
                         msg = 'Disconnected';
+                        if (!this._closed) {
+                            this._autoReconnectHandler.reconnect();
+                        }
                         break;
 
                     case Strophe.Status.DISCONNECTING:
@@ -303,7 +320,7 @@ export class Connection {
         const activateListIq = $iq({type : 'set'})
             .c('query', {xmlns : 'jabber:iq:privacy'})
             .c('active', {name : 'invisible'});
-        
+
         return Promise.all([this.sendIQ(createListIq), this.sendIQ(activateListIq)]);
     }
 
@@ -430,7 +447,7 @@ class AutoReconnectHandler {
         compassLogger.debug(`Starting XMPP ping every ${this._pingIntervalMs / 1000}s, will re-connect automatically if no response within ${this._pingTimeoutMs / 1000}s.`);
         this._pingTimer = setInterval(() => this.doPing(), this._pingIntervalMs);
     }
-    
+
     public stop() {
         clearInterval(this._pingTimer);
         this._pingTimer = undefined;
@@ -438,6 +455,13 @@ class AutoReconnectHandler {
             clearTimeout(this._pingTimeoutTimer);
             this._pingTimeoutTimer = undefined;
         }
+    }
+
+    // perform reconnect
+    public reconnect() {
+        this._connection.close();
+        this._connection.connect(this._jid, this._password)
+            .then(() => compassLogger.info("Reconnected"));
     }
 
     private doPing() {
@@ -463,14 +487,6 @@ class AutoReconnectHandler {
 
     private pingLate() {
         compassLogger.warn("Didn't receive XMPP ping in time. Reconnecting...");
-        clearTimeout(this._pingTimeoutTimer);
-        clearTimeout(this._pingTimer);
-        this._pingTimeoutTimer = undefined;
-        this._pingTimer = undefined;
-        this._connection.stropheConnection.disconnect();
-        this._connection.stropheConnection.reset();
-        this._connection.connect(this._jid, this._password);
+        this.reconnect();
     }
-
-
 }
