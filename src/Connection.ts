@@ -132,6 +132,8 @@ export class Connection {
     public close() {
         this._closed = true;
         this._autoReconnectHandler.stop();
+        // we'll get a warning in the console;
+        // https://github.com/strophe/strophejs/issues/291
         this.stropheConnection.disconnect();
         this.stropheConnection.reset();
     }
@@ -144,11 +146,8 @@ export class Connection {
      *
      */
     public disconnect() {
-        this._closed = true;
-        this._autoReconnectHandler.stop();
-        // we'll get a warning in the console;
-        // https://github.com/strophe/strophejs/issues/291
-        this.stropheConnection.disconnect();
+        this.close();
+        // this completes the rx subscriptions
         this.model.clear();
     }
 
