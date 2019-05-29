@@ -135,6 +135,8 @@ function addQueue(queue) {
 function handleQueueEvent(event) {
 
     let queue = event.emitter;
+    if (!queue) return;
+
     let elem = getQueueElement(queue);
 
     switch (event.eventType) {
