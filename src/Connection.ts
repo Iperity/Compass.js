@@ -198,7 +198,7 @@ export class Connection {
 
                     case Strophe.Status.DISCONNECTED:
                         msg = 'Disconnected';
-                        if (!this._closed) {
+                        if (!this._closed && this._autoReconnectHandler) {
                             this._autoReconnectHandler.reconnect();
                         }
                         break;
