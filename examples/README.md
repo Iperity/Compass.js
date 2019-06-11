@@ -6,7 +6,7 @@ Overview
 
 This directory contains some examples for the Compass Javascript library.
 
-Examples
+Simple example
 ---------
 
 * simple - a demonstration of how to connect to Compass and receive events; no user interface.
@@ -18,4 +18,10 @@ Examples
     Manually create a config file before using.
 * simple-typescript - An example of a Typescript app using Compass.js (with webpack)
     Manually create a config file before using.
+
+Demo applications
+---------
+    
+* callflow - utility to graphically represent call flows in the Compass platform.
+    Manually create a config file before using (see readme).
 * queues - a simple jQuery-based application to show a queue overview for your company
