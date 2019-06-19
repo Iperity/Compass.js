@@ -9,8 +9,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "compass.js": "^1.0.2",
-    "jquery": "^3.3.1",
+    "compass.js": "^1.1.5",
+    "jquery": "^3.4.0",
     "jsdom": "^13.0.0",
     "jsdom-global": "^3.0.2",
     "rxjs": "^6.3.3",
