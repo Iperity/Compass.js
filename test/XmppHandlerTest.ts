@@ -5,7 +5,7 @@ import {
     CallPointType,
     ExternalCallPoint,
     UserCallPoint,
-    DialplanCallPoint, Call, Queue, QueueCallPoint, CallState, CallEndReason,
+    DialplanCallPoint, Call, Queue, QueueCallPoint, CallState, CallEndReason, ResourceCallPoint, Side,
 } from "../src/Model";
 import {XmppHandler} from "../src/XmppHandler";
 import {Event, EventType} from "../src/Events";
@@ -301,6 +301,18 @@ const xmlCallUpdateStateNotification = $.parseXML('<notification xmlns="http://i
     '      <properties />\n' +
     '   </call>\n' +
     '</notification>',
+).documentElement;
+const xmlCallStepResultNotification = $.parseXML('<notification xmlns=\'http://iperity.com/compass\' xmlns:xsi="\n' +
+    '       http://www.w3.org/2001/XMLSchema-instance" xsi:type="callStepResultNotification"' +
+    '       type="notification.call.stepresult" timestamp="1567182649">' +
+    '       <callId>IKhDw.MuTOkUTDa8nEV-6dd.c133ada042758fa0b92a6ed8621bd224.0</callId>' +
+    '       <result>1</result>' +
+    '       <side>DESTINATION</side>' +
+    '       <callpoint xsi:type="callpointResource" type="Resource" id="275">' +
+    '           <timeCreated>1567182637</timeCreated><timeStarted>1567182637</timeStarted>' +
+    '           <state>ANSWERED</state><properties/><resourceType>ivr</resourceType><resourceId>462859</resourceId>' +
+    '           <name>IVR menu</name></callpoint>' +
+    '</notification>'
 ).documentElement;
 const xmlCallEndNotification = $.parseXML('<notification xmlns="http://iperity.com/compass" xmlns:xsi="\n' +
     '       http://www.w3.org/2001/XMLSchema-instance" timestamp\n' +
@@ -738,6 +750,21 @@ describe('XmppHandler :: Call', () => {
 
         ev = callEvents.next();
         expect(ev.data.oldCallpoint.state).equals(CallPointState.connecting);
+    });
+
+    it('notification.call.stepresult', () => {
+
+        xmppHandler.handleNotification($(xmlCallStepResultNotification));
+
+        expect(callEvents.size()).equals(1);
+
+        let ev = callEvents.next();
+        expect(ev.eventType).equals(EventType.Changed);
+        expect(ev.data.updateType).equals('stepResult');
+        expect(ev.data.result).equals('1');
+        expect(ev.data.side).equals(Side.destination);
+        let cp = ev.data.callpoint as ResourceCallPoint;
+        expect(cp.name).equals('IVR menu');
     });
 
     it('notification.call.end', () => {

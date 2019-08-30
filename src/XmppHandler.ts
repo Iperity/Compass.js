@@ -1,19 +1,20 @@
 import {Event, EventType} from './Events';
 import {compassLogger} from "./Logging";
 import {
-    Model,
     Call,
     CallEndReason,
     CallPoint,
     Company,
     CompassObject,
+    Model,
     Queue,
     QueueCallPoint,
     QueueMember,
+    Side,
     User,
     UserCallPoint,
 } from "./Model";
-import {ParserRegistry, ObjectType, parseBoolean, parseNumberOrNull} from "./Parsers";
+import {ObjectType, parseBoolean, parseNumberOrNull, ParserRegistry} from "./Parsers";
 import * as $ from "jquery";
 
 /**
@@ -301,6 +302,15 @@ enum CallUpdateEventType {
     both = 'BOTH',
 }
 
+enum XmlCallSide {
+    source = 'SOURCE',
+    destination = 'DESTINATION',
+}
+
+function convertCallSide(side: XmlCallSide): Side {
+    return side === XmlCallSide.source ? Side.source : Side.destination;
+}
+
 /**
  * Handle XMPP notifications.
  */
@@ -358,6 +368,9 @@ class XmppNotificationHandler {
                 break;
             case 'notification.call.update':
                 this.handleCallUpdateNotification(not);
+                break;
+            case 'notification.call.stepresult':
+                this.handleCallStepResultNotification(not);
                 break;
             default:
                 compassLogger.warn(`Don't know how to handle notification type ${type} .`);
@@ -475,6 +488,28 @@ class XmppNotificationHandler {
             call.domain.notify(new Event(call, EventType.Changed,
                 { updateType: 'destination', oldCallpoint: oldDest}));
         }
+    }
+
+    protected handleCallStepResultNotification(not: JQuery) {
+        compassLogger.debug("CallStepResult notification received");
+
+        const callId = not.find('>callId').text();
+        const call = this._xmppHandler.model.calls[callId];
+        if (!call) {
+            compassLogger.warn(`Received stepResult notification for call ${callId} we don't know about.`);
+            return;
+        }
+
+        const side = not.find('>side').text() as XmlCallSide;
+        const callpoint = this._parser.parse(not.find('>callpoint'), ObjectType.CallPoint);
+        const result = not.find('>result').text();
+
+        call.domain.notify(new Event(call, EventType.Changed, {
+            updateType: 'stepResult',
+            side: convertCallSide(side),
+            callpoint: callpoint,
+            result: result,
+        }));
     }
 
     protected handleUserNotification(not: JQuery) {
