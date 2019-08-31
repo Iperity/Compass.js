@@ -22,8 +22,8 @@ export class RestApi {
      */
     public baseUrl: string;
 
-    private _username: string;
-    private _basedom: string;
+    private readonly _username: string;
+    private readonly _basedom: string;
 
     private _myUserPromise: Promise<any> = null;
     private _myCompanyUrlPromise: Promise<any> = null;
@@ -80,7 +80,7 @@ export class RestApi {
     public doRequest(url: string, method: string, data: any): Promise<any> {
 
         const fullUrl = url.indexOf('://') === -1 ? `https://rest.${this._basedom}/${url}` : url;
-        const promise = $.ajax(fullUrl, {
+        const deferred = $.ajax(fullUrl, {
             method: method,
             headers: {
                 "Accept": CONTENT_TYPE,
@@ -94,12 +94,12 @@ export class RestApi {
             // by default, jQuery treats empty response as an error,
             // but Compass API has 'void' methods.
             dataFilter: (response) => response === '' ? '{}' : response,
-        });
-
-        promise.fail( (result, err) => {
-            compassLogger.warn(`REST ${method} request to ${url} with data ${JSON.stringify(data) } failed with error: ${err}`);
-        });
-        return Promise.resolve(promise);
+        })
+            .fail((jqXHR, textStatus, _errorThrown) => {
+                compassLogger.warn(`REST ${method} request to ${url} with data ${JSON.stringify(data)} failed with error: ${textStatus}`);
+            });
+        // convert jquery deferred to promise
+        return Promise.resolve(deferred);
     }
 
     /**
@@ -126,12 +126,9 @@ export class RestApi {
     public getMyFirstIdentity(): Promise<any> {
         if (!this._myFirstIdentityPromise) {
             this._myFirstIdentityPromise = this.getMyUser()
-                .then( (user) => {
+                .then((user) => {
                     return this.get(`${user.self}/identities`)
-                        .then( (identities) => {
-                            const firstIdentity = identities[0];
-                            return firstIdentity;
-                        });
+                        .then(identities => identities[0]);
                 });
         }
         return this._myFirstIdentityPromise;

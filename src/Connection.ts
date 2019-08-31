@@ -236,7 +236,7 @@ export class Connection {
         }).then(() => {
             // Get our company-id
             return this._getCompany()
-                .catch((e) => {
+                .catch((_e) => {
                     throw new Error("User has no company");
                 });
         }).then((res) => {

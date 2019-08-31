@@ -203,6 +203,7 @@ export class XmppHandler {
     /**
      * Send the appropriate events after a new call was added to the model.
      * @param {Call} call - The call to send the events for.
+     * @param {any} data - additional data for event
      */
     public sendEventsCallAdded(call: Call, data: any = null) {
         this.sendEventsOnCallAndEndpoint(call, true, data);
@@ -210,7 +211,8 @@ export class XmppHandler {
 
     /**
      * Send the appropriate events after a call was removed from the model.
-     * @param {Call} call - The call to send the events for.
+     * @param {Call} call - The call to send the events for
+     * @param {any} data - additional data for event
      */
     public sendEventsCallRemoved(call: Call, data: any = null) {
         this.sendEventsOnCallAndEndpoint(call, false, data);

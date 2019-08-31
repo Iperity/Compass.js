@@ -50,8 +50,8 @@ export enum Side {
 /**
  * Given a side from the Side enum, het the otherwise
  *
- * @param {Side} a side
- * @returns {Side} - the other side compared to the 'side' parameter.
+ * @param {Side} side the side
+ * @returns {Side} the other side compared to the 'side' parameter.
  */
 export function OtherSide(side: Side) {
     return side === Side.source ? Side.destination : Side.source;
@@ -405,7 +405,6 @@ export class QueueMember {
     /**
      * Create a QueueMember
      *
-     * @param {string} id - the identifier of the object.
      * @param {string} userId - the id of the user that is logged on to the queue.
      * @param {string} queueId - the id of the queue that the user is logged onto.
      * @param {string} priority - numerical priority of the user in the queue, from 1-3. Accepts a string for parsing convenience.
