@@ -7,8 +7,8 @@ if (typeof config === 'undefined') {
 const conn  = new compass.Connection(config.basedom);
 
 // For debugging:
-// compass.compassLogger.setLevel(compass.compassLogger.levels.DEBUG);
-// conn.logXmpp = true;
+compass.compassLogger.setLevel(compass.compassLogger.levels.DEBUG);
+conn.logXmpp = true;
 
 const promise = conn.connect(config.jid, config.password);
 
@@ -68,11 +68,16 @@ promise.then(function () {
                         break;
                 }
                 console.log(`... ${details}`);
+            case compass.EventType.Added:
+                // For added or changed display callSummary.
+                const call = conn.model.calls[event.emitter.id];
+                if (call) console.log(callSummary(call, event));
                 break;
             case compass.EventType.PropertyChanged:
                 logPropertyChanged(event);
                 break;
         }
+
     });
 
     console.log("Waiting for changes.");
@@ -80,6 +85,44 @@ promise.then(function () {
     console.log("Login failed: ", e);
 });
 
+
+function callpointDescription(callpoint) {
+
+    let description = "";
+    switch (callpoint.type) {
+        case 'External':
+            description = callpoint.number;
+            break;
+        case 'Dialplan':
+            description = callpoint.description;
+            break;
+        case 'User':
+            description = callpoint.userName;
+            break;
+        case 'Queue':
+            description = callpoint.queueName;
+            break;
+    }
+
+    return `${callpoint.type} (${description})`
+}
+
+function callSummary(call, event) {
+    if( typeof callSummary.counter == 'undefined' ) {
+        callSummary.counter = [];
+    }
+    if (typeof callSummary.counter[call.id] == 'undefined') {
+        callSummary.counter[call.id] = 0;
+    }
+    /*switch(event.eventType) {
+        case compass.EventType.Changed:
+        case compass.EventType.Added:
+            callSummary.counter[call.id];
+            break;
+    }*/
+
+    return `${callSummary.counter[call.id]++}: [${call.id.substr(0,4)}] ${callpointDescription(call.source)} -> ${callpointDescription(call.destination)} (${call.source.state}, ${call.destination.state}, ${call.state})`;
+}
 
 /*
  * console.log the object
