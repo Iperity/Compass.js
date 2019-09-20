@@ -5,7 +5,7 @@
   "main": "./build/Compass.js",
   "types": "./build/Compass.d.ts",
   "scripts": {
-    "test": "./node_modules/nyc/bin/nyc.js ./node_modules/.bin/mocha --compilers ts:ts-node/register ./test/*.ts",
+    "test": "./node_modules/nyc/bin/nyc.js ./node_modules/.bin/mocha",
     "watch": "webpack --progress --colors --watch",
     "build": "webpack --progress --colors",
     "build-ci": "NODE_ENV=production webpack"
