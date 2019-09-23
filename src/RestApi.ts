@@ -69,6 +69,29 @@ export class RestApi {
     }
 
     /**
+     * Perform a patch-request on the rest-api.
+     *
+     * @param url - url to perform the rest-request on.
+     * If the url contains '://', it's assumed to be a whole url. Otherwise, it's assumed to be a path, and the baseUrl is prepended.
+     * @param [data] - Request body as a javascript object.
+     * @returns {Promise<Object>} - Returns a Promise that resolves with the answer from the rest-api in a js object, or rejects if an error occurs.
+     */
+    public patch(url: string, data: any): Promise<any> {
+        return this.doRequest(url, 'PATCH', data);
+    }
+
+    /**
+     * Perform a delete-request on the rest-api.
+     *
+     * @param url - url to perform the rest-request on.
+     * If the url contains '://', it's assumed to be a whole url. Otherwise, it's assumed to be a path, and the baseUrl is prepended.
+     * @returns {Promise<Object>} - Returns a Promise that resolves when the object is deleted, or rejects if an error occurs.
+     */
+    public delete(url: string): Promise<any> {
+        return this.doRequest(url, 'DELETE', undefined);
+    }
+
+    /**
      * Perform API request.
      *
      * @param url - url to perform the rest-request on.
