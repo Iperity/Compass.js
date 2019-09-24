@@ -63,6 +63,10 @@ promise.then(function () {
                     case 'state':
                         details = 'state changed to ' + event.emitter.state;
                         break;
+                    case 'stepResult':
+                        const rp = event.data.callpoint;
+                        details = 'choice "' + rp.name + '" result ' + event.data.result;
+                        break;
                     default:
                         details = event.data.updateType;
                         break;
