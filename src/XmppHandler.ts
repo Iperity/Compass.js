@@ -65,16 +65,24 @@ export class XmppHandler {
 
     /**
      * Process the result of a GET request with type == call
-     * @param {JQuery} calls - the result of a GET request with type == call
+     * @param {JQuery} callsElem - the result of a GET request with type == call
      */
-    public setCallsFromXmpp(calls: JQuery) {
-        compassLogger.info('Received calls: ' + calls.length);
+    public setCallsFromXmpp(callsElem: JQuery) {
+        compassLogger.info('Received calls: ' + callsElem.length);
 
         this.model.calls = {};
-        calls.toArray().map((elem) => $(elem)).forEach((callElem) => {
-            const call = this.parser.parse(callElem, ObjectType.Call) as Call;
+
+        const hasParent = (e: JQuery) => e.find('>properties >QueueCallForCall').length;
+        const addCall = (e: JQuery) => {
+            const call = this.parser.parse(e, ObjectType.Call) as Call;
             this.addCall(call, false);
-        });
+        };
+
+        const calls = callsElem.toArray().map(e => $(e));
+
+        // make sure to parse parent calls before child calls (#24)
+        calls.filter(e => !hasParent(e)).forEach(addCall);
+        calls.filter(e => hasParent(e)).forEach(addCall);
     }
 
     /**
