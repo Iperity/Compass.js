@@ -441,12 +441,12 @@ class XmppNotificationHandler {
             // Source & destination changed.
             case CallUpdateEventType.both:
                 call.source = callFromNotification.source;
-                this._xmppHandler.sendEventsCallUpdated(call, oldSource, call.source);
                 sourceChanged = true;
-
                 call.destination = callFromNotification.destination;
-                this._xmppHandler.sendEventsCallUpdated(call, oldDest, call.destination);
                 destinationChanged = true;
+
+                this._xmppHandler.sendEventsCallUpdated(call, oldSource, call.source);
+                this._xmppHandler.sendEventsCallUpdated(call, oldDest, call.destination);
                 break;
 
             // State (call state or callpoint state) changed.
