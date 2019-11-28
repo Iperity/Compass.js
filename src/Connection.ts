@@ -310,7 +310,7 @@ export class Connection {
         this.stropheConnection.send($pres().c('priority').t('1'));
     }
 
-    private _setInvisible(): Promise<[JQuery, JQuery]> {
+    private _setInvisible(): Promise<JQuery[]> {
         const createListIq = $iq({type : 'set'})
             .c('query', {xmlns : 'jabber:iq:privacy'})
             .c('list', {name : 'invisible'})
