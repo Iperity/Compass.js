@@ -143,6 +143,7 @@ export enum CallPointType {
     external = "External",
     resource = "Resource",
     queue = "Queue",
+    listenIn = "ListenIn",
 }
 
 /**
@@ -287,6 +288,22 @@ export class ResourceCallPoint extends CallPoint {
     public name: string;
 }
 
+
+/**
+ * Class for objects representing a side of a call that listens into another call.
+ */
+export class ListenInCallPoint extends CallPoint {
+    public listenedToCallId: string;
+
+    /**
+     * Get the call-id of the call that's being listened to.
+     *
+     * @returns {Call} - The call that's being listened to.
+     */
+    public getListenedToCall(): Call {
+        return this.domain.calls[this.listenedToCallId];
+    }
+}
 
 /**
  * Class for objects representing a side of a call that is a call-queue.

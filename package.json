@@ -1,6 +1,6 @@
 {
   "name": "compass.js",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "",
   "main": "./build/Compass.js",
   "types": "./build/Compass.d.ts",
@@ -46,6 +46,7 @@
     "instrument": true
   },
   "dependencies": {
+    "arrify": "^2.0.1",
     "loglevel": "^1.6.4"
   },
   "files": [
@@ -54,7 +55,7 @@
     "README.md"
   ],
   "devDependencies": {
-    "@types/chai": "^4.2.3",
+    "@types/chai": "^4.2.0",
     "@types/expect": "^1.20.4",
     "@types/jquery": "^3.3.31",
     "@types/jsdom": "^12.2.4",
@@ -67,7 +68,7 @@
     "dts-bundle-webpack": "1.0.2",
     "jquery": "^3.4.1",
     "jsdom": "^15.1.1",
-    "mocha": "^6.2.0",
+    "mocha": "^6.2.2",
     "nyc": "^14.1.1",
     "rxjs": "^6.5.3",
     "source-map-support": "^0.5.13",

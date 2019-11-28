@@ -12,7 +12,7 @@ import {
     CompassObject,
     DialplanCallPoint,
     ExternalCallPoint,
-    Language,
+    Language, ListenInCallPoint,
     Queue,
     QueueCallPoint,
     QueueMember,
@@ -249,6 +249,14 @@ class DialplanCallPointParser implements ICallPointSubtypeParser {
 }
 CallPointParser.register(new DialplanCallPointParser(), CallPointType.dialplan);
 
+class ListenInCallPointParser implements ICallPointSubtypeParser {
+    public parse(id: string, elem: JQuery, parserContext: ParserContext): CallPoint {
+        const cp = new ListenInCallPoint(id, elem, parserContext.model);
+        cp.listenedToCallId = elem.find('>listenedToCallId').text();
+        return cp;
+    }
+}
+CallPointParser.register(new ListenInCallPointParser(), CallPointType.listenIn);
 
 // // ============================ Utilities ============================
 
