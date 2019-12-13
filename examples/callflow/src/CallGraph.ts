@@ -3,12 +3,13 @@ import {
     CallPoint,
     CallPointState,
     CallPointType,
+    DialplanCallPoint,
     Event,
     EventType,
     ExternalCallPoint,
+    ListenInCallPoint,
     QueueCallPoint,
     UserCallPoint,
-    ListenInCallPoint,
 } from "compass.js";
 import * as $ from 'jquery';
 
@@ -38,7 +39,7 @@ export class CallGraph {
     }
 
     handle(ev: Event) {
-        switch(ev.eventType) {
+        switch (ev.eventType) {
             case EventType.Changed:
                 this.handleChange(ev);
                 break;
@@ -115,7 +116,11 @@ export class CallGraph {
 
     private callpointToString(cp: CallPoint) {
         let desc = null;
-        switch(cp.type) {
+        switch (cp.type) {
+            case CallPointType.dialplan:
+                const dpCp = (cp as DialplanCallPoint);
+                desc = `exten=${dpCp.exten}, desc=${dpCp.description}`;
+                break;
             case CallPointType.queue:
                 const queue = (cp as QueueCallPoint).getQueue();
                 desc = queue.id + '=' + queue.name;
