@@ -46,7 +46,6 @@
     "instrument": true
   },
   "dependencies": {
-    "arrify": "^2.0.1",
     "loglevel": "^1.6.4"
   },
   "files": [
