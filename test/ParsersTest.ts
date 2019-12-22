@@ -1,5 +1,5 @@
 import * as $ from 'jquery';
-import {Call, CallPoint, CallPointType, Model, ResourceCallPoint, ResourceType, UserCallPoint} from "../src/Model";
+import {Call, CallPoint, CallPointType, Model, ResourceCallPoint, ResourceType, UserCallPoint, ListenInCallPoint} from "../src/Model";
 import {expect} from 'chai';
 import {ObjectType, ParserRegistry} from "../src/Parsers";
 
@@ -115,6 +115,21 @@ describe('Parsers :: Callpoints', () => {
         expect(cp.userId).to.equal('11110');
         expect(cp.userName).to.equal('testuser');
         expect(cp.identityId).to.equal('8426');
+    });
+
+    it('parses a ListenInEndpoint', () => {
+
+        const cp = parseCallpoint<ListenInCallPoint>(`
+<source xsi:type='callpointListenIn' type='ListenIn' id='4'>
+    <timeCreated>1577043609</timeCreated>
+    <state>ANSWERED</state>
+    <properties/>
+    <listenedToCallId>f768eece63a1b0057b938f5c31f7143de496665f</listenedToCallId>
+</source>
+    `);
+
+        expect(cp.type).to.equal(CallPointType.listenIn);
+        expect(cp.listenedToCallId).to.equal('f768eece63a1b0057b938f5c31f7143de496665f');
     });
     
 });
