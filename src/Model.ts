@@ -296,7 +296,7 @@ export class ListenInCallPoint extends CallPoint {
     public listenedToCallId: string;
 
     /**
-     * Get the call-id of the call that's being listened to.
+     * Get the call that's being listened to.
      *
      * @returns {Call} - The call that's being listened to.
      */

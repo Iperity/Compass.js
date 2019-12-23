@@ -117,7 +117,7 @@ describe('Parsers :: Callpoints', () => {
         expect(cp.identityId).to.equal('8426');
     });
 
-    it('parses a ListenInEndpoint', () => {
+    it('parses a ListenInCallPoint', () => {
 
         const cp = parseCallpoint<ListenInCallPoint>(`
 <source xsi:type='callpointListenIn' type='ListenIn' id='4'>
