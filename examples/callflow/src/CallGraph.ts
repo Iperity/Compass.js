@@ -1,12 +1,14 @@
 import {
     Call,
-    CallPoint, CallPointState,
+    CallPoint,
+    CallPointState,
     CallPointType,
     Event,
     EventType,
     ExternalCallPoint,
     QueueCallPoint,
-    UserCallPoint
+    UserCallPoint,
+    ListenInCallPoint,
 } from "compass.js";
 import * as $ from 'jquery';
 
@@ -124,6 +126,10 @@ export class CallGraph {
             case CallPointType.user:
                 let user = (cp as UserCallPoint).getUser();
                 desc = user.id + '=' + user.name;
+                break;
+            case CallPointType.listenIn:
+                const listenedToCallId = (cp as ListenInCallPoint).getListenedToCall().id;
+                desc = "Listening to: " + listenedToCallId;
                 break;
         }
 
