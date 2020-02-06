@@ -1,12 +1,15 @@
 import {compassLogger} from "./Logging";
 import * as $ from "jquery";
 
-const CONTENT_TYPE = 'application/vnd.iperity.compass.v2+json';
+// Compass content types, in decreasing order of preference
+const CONTENT_TYPES = [
+    'application/vnd.iperity.compass.v2+json',
+];
 
 /**
  * Helper class to perform rest-requests on the Compass platform.
  *
- * To obtain an instance, use the 'restApi' member of the connection.
+ * To obtain an instance, either create it directly, or use the 'rest' member of your Connection instance.
  */
 export class RestApi {
 
@@ -25,7 +28,9 @@ export class RestApi {
     private readonly _username: string;
     private readonly _basedom: string;
 
-    private _myUserPromise: Promise<any> = null;
+    private _user: any = null;
+    private _contentType: string;
+
     private _myCompanyUrlPromise: Promise<any> = null;
     private _myFirstIdentityPromise: Promise<any> = null;
 
@@ -101,16 +106,22 @@ export class RestApi {
      * @returns {Promise<any>} - Returns a Promise that resolves with the answer from the rest-api in a js object, or rejects if an error occurs.
      */
     public doRequest(url: string, method: string, data: any): Promise<any> {
+        // determine version to use, if not yet determined, and then request
+        const versionPromise = this._contentType ? Promise.resolve() : this.determineApiVersion();
+        return versionPromise.then(() => this.doRequestInternal(url, method, data));
+    }
+
+    private doRequestInternal(url: string, method: string, data: any): Promise<any> {
 
         const fullUrl = url.indexOf('://') === -1 ? `https://rest.${this._basedom}/${url}` : url;
         const deferred = $.ajax(fullUrl, {
             method: method,
             headers: {
-                "Accept": CONTENT_TYPE,
+                "Accept": this._contentType,
                 "Authorization": this.authHeader,
                 "X-No-Redirect": "true",
             },
-            contentType: CONTENT_TYPE,
+            contentType: this._contentType,
             dataType: 'json',
             data: JSON.stringify(data),
             // parse empty response into object
@@ -126,6 +137,29 @@ export class RestApi {
     }
 
     /**
+     * Determine the Compass version we're talking to.
+     * When completed, `this._user` is filled.
+     */
+    private async determineApiVersion() {
+        for (const version of CONTENT_TYPES) {
+            this._contentType = version;
+            try {
+                this._user = await this.get('user');
+                // Found acceptable version; return.
+                return;
+            } catch (error) {
+                if (error.status === 406) {
+                    // HTTP not acceptable; try other version
+                } else {
+                    // actual compass error; pass through
+                    throw error;
+                }
+            }
+        }
+        throw new Error("Cannot determine Compass version");
+    }
+
+    /**
      * Get the object representing the logged-in user from the rest-api.
      *
      * See the rest-api documentation or example code for more details.
@@ -133,10 +167,11 @@ export class RestApi {
      * @returns {Promise<Object>} - A promise that resolves with the user object, or rejects if an error occurs.
      */
     public getMyUser(): Promise<any> {
-        if (!this._myUserPromise) {
-            this._myUserPromise = this.get('user');
+        if (!this._user) {
+            // determineVersion will fill the user property
+            return this.determineApiVersion().then(() => this._user);
         }
-        return this._myUserPromise;
+        return Promise.resolve(this._user);
     }
 
     /**
