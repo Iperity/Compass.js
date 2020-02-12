@@ -138,7 +138,7 @@ export class RestApi {
 
     /**
      * Determine the Compass version we're talking to.
-     * When completed, `this._user` is filled.
+     * When completed, {@link _contentType} and {@link _user} are filled.
      */
     private async determineApiVersion() {
         for (const version of CONTENT_TYPES) {
@@ -148,6 +148,7 @@ export class RestApi {
                 // Found acceptable version; return.
                 return;
             } catch (error) {
+                this._contentType = null;
                 if (error.status === 406) {
                     // HTTP not acceptable; try other version
                 } else {
