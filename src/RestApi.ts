@@ -1,5 +1,6 @@
 import {compassLogger} from "./Logging";
 import * as $ from "jquery";
+import { b64EncodeUnicode } from "./Utils";
 
 const CONTENT_TYPE = 'application/vnd.iperity.compass.v2+json';
 
@@ -40,7 +41,7 @@ export class RestApi {
     constructor(basedom: string, username: string, password: string) {
         this._basedom = basedom;
         this._username = username;
-        this.authHeader = "Basic " + btoa(this._username + ":" + password);
+        this.authHeader = "Basic " + b64EncodeUnicode(this._username + ":" + password);
         this.baseUrl = `https://rest.${this._basedom}`;
     }
 
