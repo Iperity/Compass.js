@@ -106,9 +106,7 @@ export class RestApi {
      * @returns {Promise<any>} - Returns a Promise that resolves with the answer from the rest-api in a js object, or rejects if an error occurs.
      */
     public doRequest(url: string, method: string, data: any): Promise<any> {
-        // determine version to use, if not yet determined, and then request
-        const versionPromise = this._contentType ? Promise.resolve() : this.determineApiVersion();
-        return versionPromise.then(() => this.doRequestInternal(url, method, data));
+        return this.determineApiVersion().then(() => this.doRequestInternal(url, method, data));
     }
 
     private doRequestInternal(url: string, method: string, data: any): Promise<any> {
@@ -140,7 +138,13 @@ export class RestApi {
      * Determine the Compass version we're talking to.
      * When completed, {@link _contentType} and {@link _user} are filled.
      */
-    private async determineApiVersion() {
+    private async determineApiVersion(): Promise<any> {
+
+        if (this._contentType) {
+            // already determined!
+            return;
+        }
+
         for (const version of CONTENT_TYPES) {
             this._contentType = version;
             try {
