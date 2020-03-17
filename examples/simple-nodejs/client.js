@@ -10,25 +10,30 @@ const Compass = require("compass.js");
 // Load the config (copy from config-example.js and fill out your own credentials)
 const config = require("./config.js");
 
+async function main() {
+    // Create the connection, and connect.
+    const conn = new Compass.Connection(config.basedom);
 
-// Create the connection, and connect.
-const conn  = new Compass.Connection(config.basedom);
+    // For debugging:
+    // Compass.compassLogger.setLevel(Compass.compassLogger.levels.DEBUG);
+    // conn.logXmpp = true;
 
-// For debugging:
-// Compass.compassLogger.setLevel(Compass.compassLogger.levels.DEBUG);
-// conn.logXmpp = true;
+    await conn.connect(config.jid, config.password);
 
-const promise = conn.connect(config.jid, config.password);
-
-// We are connected and all data-models have been retrieved.
-promise.then(function () {
+    // We are connected and all data-models have been retrieved.
     console.log("Connected!");
-    process.exit(0);
-});
 
-promise.catch(function(e) {
-    console.log(e);
-    process.exit(1);
-});
+    // Let's try a REST request too
+    const restUser = await conn.rest.getMyUser();
+    console.log("Got REST user: ", restUser);
 
-// See the examples/simple example for more information on what to do once connected.
+    // See the examples/simple example for more information on what to do once connected.
+
+    conn.close();
+}
+
+main()
+    .catch((e) => {
+        console.error(e);
+        process.exit(1);
+    });
