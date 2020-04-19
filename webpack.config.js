@@ -1,8 +1,18 @@
-const DtsBundleWebpack = require('dts-bundle-webpack');
 const webpackRxjsExternals = require('webpack-rxjs-externals');
 const path = require('path');
+var DeclarationBundlerPlugin = require('declaration-bundler-webpack-plugin');
 
 const IS_CI = !!process.env.CI;
+
+// NOTE: declaration-bundler-webpack-plugin problem fix https://github.com/TypeStrong/ts-loader/issues/263
+let buggyFunc = DeclarationBundlerPlugin.prototype.generateCombinedDeclaration;
+DeclarationBundlerPlugin.prototype.generateCombinedDeclaration = function (declarationFiles) {
+    for (var fileName in declarationFiles) {
+        let declarationFile = declarationFiles[fileName];
+        declarationFile._value = declarationFile._value || declarationFile.source();
+    }
+    return buggyFunc.call(this, declarationFiles);
+}
 
 module.exports = {
     entry: './src/Compass.ts',
@@ -30,18 +40,19 @@ module.exports = {
 
             {
                 test: /\.tsx?$/,
-                loader: 'awesome-typescript-loader',
+                use: [{
+                    loader: 'babel-loader'
+                }, {
+                    loader: 'ts-loader'
+                }]
             },
         ],
     },
 
     plugins: [
-        new DtsBundleWebpack({
-            name: 'compass.js',
-            main: path.resolve(__dirname, 'build') + '/types/Compass.d.ts',
-            out: path.resolve(__dirname, 'build') + '/Compass.d.ts',
-            outputAsModuleFolder: true, // to use npm in-package typings,
-            removeSource: true,
+        new DeclarationBundlerPlugin({
+            moduleName: '"compass.js"',
+            out: 'Compass.d.ts',
         })
     ]
 };
