@@ -25,7 +25,8 @@
     "ordered-imports": false,
     "quotemark": false,
     "member-ordering": false,
-    "radix": false
+    "radix": false,
+    "indent": [true, "spaces", 4]
   },
   "jsRules": {
   },
