@@ -5,6 +5,7 @@ var DeclarationBundlerPlugin = require('declaration-bundler-webpack-plugin');
 const IS_CI = !!process.env.CI;
 
 // NOTE: declaration-bundler-webpack-plugin problem fix https://github.com/TypeStrong/ts-loader/issues/263
+// NOTE: see PR 36 for more details on various declaration bundler plugins
 let buggyFunc = DeclarationBundlerPlugin.prototype.generateCombinedDeclaration;
 DeclarationBundlerPlugin.prototype.generateCombinedDeclaration = function (declarationFiles) {
     for (var fileName in declarationFiles) {
