@@ -23,7 +23,10 @@ const promise = conn.connect(config.jid, config.password);
 // We are connected and all data-models have been retrieved.
 promise.then(function () {
     console.log("Connected!");
-    process.exit(0);
+    conn.rest.getApiVersion().then(v => {
+        console.log('Found API version', v)
+        process.exit(0);
+    });
 });
 
 promise.catch(function(e) {

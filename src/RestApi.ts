@@ -1,10 +1,8 @@
 import {compassLogger} from "./Logging";
 import * as $ from "jquery";
 
-// Compass content types, in decreasing order of preference
-const CONTENT_TYPES = [
-    'application/vnd.iperity.compass.v2+json',
-];
+// Compass API versions, in decreasing order of preference
+const API_VERSIONS = [2];
 
 /**
  * Helper class to perform rest-requests on the Compass platform.
@@ -29,7 +27,7 @@ export class RestApi {
     private readonly _basedom: string;
 
     private _user: any = null;
-    private _contentType: string;
+    private _apiVersion?: number;
 
     private _myCompanyUrlPromise: Promise<any> = null;
     private _myFirstIdentityPromise: Promise<any> = null;
@@ -112,14 +110,15 @@ export class RestApi {
     private doRequestInternal(url: string, method: string, data: any): Promise<any> {
 
         const fullUrl = url.indexOf('://') === -1 ? `https://rest.${this._basedom}/${url}` : url;
+        const contentType = `application/vnd.iperity.compass.v${this._apiVersion}+json`;
         const deferred = $.ajax(fullUrl, {
             method: method,
             headers: {
-                "Accept": this._contentType,
+                "Accept": contentType,
                 "Authorization": this.authHeader,
                 "X-No-Redirect": "true",
             },
-            contentType: this._contentType,
+            contentType: contentType,
             dataType: 'json',
             data: JSON.stringify(data),
             // parse empty response into object
@@ -135,24 +134,31 @@ export class RestApi {
     }
 
     /**
-     * Determine the Compass version we're talking to.
-     * When completed, {@link _contentType} and {@link _user} are filled.
+     * Retrieve the highest API version that the Compass instance supports.
      */
-    private async determineApiVersion(): Promise<any> {
+    public async getApiVersion(): Promise<number> {
+        return this.determineApiVersion();
+    }
 
-        if (this._contentType) {
+    /**
+     * Determine the Compass version we're talking to.
+     * When completed, {@link _apiVersion} and {@link _user} are filled.
+     */
+    private async determineApiVersion(): Promise<number> {
+
+        if (this._apiVersion) {
             // already determined!
-            return;
+            return this._apiVersion;
         }
 
-        for (const version of CONTENT_TYPES) {
-            this._contentType = version;
+        for (const version of API_VERSIONS) {
+            this._apiVersion = version;
             try {
                 this._user = await this.get('user');
                 // Found acceptable version; return.
-                return;
+                return this._apiVersion;
             } catch (error) {
-                this._contentType = null;
+                this._apiVersion = null;
                 if (error.status === 406) {
                     // HTTP not acceptable; try other version
                 } else {
