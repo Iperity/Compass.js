@@ -5,7 +5,7 @@ import {
     CallPointType,
     ExternalCallPoint,
     UserCallPoint,
-    DialplanCallPoint, Call, Queue, QueueCallPoint, CallState, CallEndReason, ResourceCallPoint, Side,
+    DialplanCallPoint, Call, Queue, QueueCallPoint, CallState, CallEndReason, ResourceCallPoint, Side, ReceiveCalls,
 } from "../src/Model";
 import {XmppHandler} from "../src/XmppHandler";
 import {Event, EventType} from "../src/Events";
@@ -98,6 +98,12 @@ const xmlGetUsersResult = $.parseXML(
     '            <language>nl</language>\n' +
     '            <contact>test@iperity.com</contact>\n' +
     '            <extensions>200</extensions>\n' +
+    '            <receiveCalls>NONE</receiveCalls>\n' +
+    '            <displayStatus>blockme</displayStatus>\n' +
+    '            <wrapupState>\n' +
+    '               <callId>testcallid</callId>\n' +
+    '               <endTime>1234</endTime>\n' +
+    '            </wrapupState>\n' +
     '         </user>\n' +
     '      </result>',
 ).documentElement;
@@ -134,6 +140,19 @@ const xmlUpdateUserNotification = $.parseXML(
     '                    <newValue>Tijs Testuser</newValue>\n' +
     '                  </propertyChange>\n' +
     '</notification>',
+).documentElement;
+const xmlUpdateUserStatusNotification = $.parseXML(`
+    <notification xmlns="http://iperity.com/compass" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:type="userStatusNotification" type="notification.user.status" timestamp="1234">
+        <userId>8323556</userId>
+        <receiveCalls>NONE</receiveCalls>
+        <displayStatus>break</displayStatus>
+        <wrapupState>
+            <callId>cid</callId>
+            <endTime>12000</endTime>
+        </wrapupState>
+    </notification>
+`
 ).documentElement;
 const xmlDestroyUserNotification = $.parseXML(
     '<notification xmlns="http://iperity.com/compass" xmlns:xsi="\n' +
@@ -454,6 +473,10 @@ describe('XmppHandler :: User', () => {
         expect(modelUser).to.not.be.undefined;
         expect(modelUser.name).equals('Test User');
         expect(modelUser.phoneId).equals(1442646);
+        expect(modelUser.status.receiveCalls).equals(ReceiveCalls.none);
+        expect(modelUser.status.displayStatus).equals('blockme');
+        expect(modelUser.status.wrapupState.callId).equals('testcallid');
+        expect(modelUser.status.wrapupState.endTime).equals(1234);
     });
 
     it('removeUser', () => {
@@ -549,6 +572,37 @@ describe('XmppHandler :: User', () => {
 
         // Check
         expect(model.users[userId]).to.be.undefined;
+        expect(eventReceived).equals(true);
+    });
+
+    it('notification.user.status', () => {
+        const xmppHandler = getEmptyXmppHandler();
+        const model = xmppHandler.model;
+
+        // Create user
+        xmppHandler.handleNotification($(xmlCreateUserNotification));
+
+        const userId = '8323556';
+        const user = model.users[userId];
+
+        // Listen for event
+        let eventReceived = false;
+        model.usersObservable.subscribe((e) => {
+            eventReceived = true;
+            expect(e.eventType).equals(EventType.Changed);
+            expect(e.emitter).equals(user);
+            expect(e.data.newValue.displayStatus).equals("break");
+        });
+
+        // handle user status update notification
+        xmppHandler.handleNotification($(xmlUpdateUserStatusNotification));
+
+        // Check
+        const status = model.users[userId].status;
+        expect(status.receiveCalls).equals(ReceiveCalls.none);
+        expect(status.displayStatus, "break");
+        expect(status.wrapupState.callId, "cid");
+        expect(status.wrapupState.endTime, "12000");
         expect(eventReceived).equals(true);
     });
 });

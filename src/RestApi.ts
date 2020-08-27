@@ -3,7 +3,7 @@ import * as $ from "jquery";
 import { b64EncodeUnicode } from "./Utils";
 
 // Compass API versions, in decreasing order of preference
-const API_VERSIONS = [2];
+const API_VERSIONS = [3, 2];
 
 /**
  * Helper class to perform rest-requests on the Compass platform.

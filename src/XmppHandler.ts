@@ -1,6 +1,7 @@
 import {Event, EventType} from './Events';
 import {compassLogger} from "./Logging";
 import {
+    ReceiveCalls,
     Call,
     CallEndReason,
     CallPoint,
@@ -13,8 +14,9 @@ import {
     Side,
     User,
     UserCallPoint,
+    UserStatus,
 } from "./Model";
-import {ObjectType, parseBoolean, parseNumberOrNull, ParserRegistry} from "./Parsers";
+import {ObjectType, parseBoolean, parseNumberOrNull, ParserRegistry, parseWrapupState} from "./Parsers";
 import * as $ from "jquery";
 
 /**
@@ -143,6 +145,18 @@ export class XmppHandler {
         if (!user) return;
         delete this.model.users[userId];
         if (sendNotification) this.model.notify(new Event(user, EventType.Removed));
+    }
+
+    public userUpdateStatus(user: User, newStatus: UserStatus) {
+
+        const oldStatus = user.status;
+        user.status = newStatus;
+
+        user.domain.notify(new Event(user, EventType.Changed, {
+            name: 'status',
+            oldValue: oldStatus,
+            newValue: user.status,
+        }));
     }
 
     /**
@@ -553,6 +567,12 @@ class XmppNotificationHandler {
                 break;
             case 'notification.user.destroy':
                 this._xmppHandler.removeUser(userId);
+                break;
+            case 'notification.user.status':
+                const receiveCalls = not.find('>receiveCalls').text() as ReceiveCalls;
+                const displayStatus = not.find('>displayStatus').text();
+                const wrapupState = parseWrapupState(not.find('>wrapupState'));
+                this._xmppHandler.userUpdateStatus(user, new UserStatus(receiveCalls, displayStatus, wrapupState));
                 break;
             default:
                 compassLogger.warn(`Unknown user notification type ${type}`);
