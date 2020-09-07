@@ -47,6 +47,43 @@ export enum Side {
     destination,
 }
 
+export class UserStatus {
+    public receiveCalls: ReceiveCalls;
+    public displayStatus: string;
+    public wrapupState: WrapupState | null;
+
+    constructor(receiveCalls: ReceiveCalls, displayStatus: string, wrapupState: WrapupState | null) {
+        this.receiveCalls = receiveCalls;
+        this.displayStatus = displayStatus;
+        this.wrapupState = wrapupState;
+    }
+}
+
+/**
+ * Receive calls setting of a user
+ */
+export enum ReceiveCalls {
+    all = "ALL",
+    none = "NONE",
+    onlyDirect = "ONLY_DIRECT",
+}
+
+export class WrapupState {
+    /**
+     * The call id for which wrap-up time is enabled.
+     */
+    public callId: string;
+    /**
+     * The time when wrap-up ends; can be null if wrap-up time is indefinite.
+     */
+    public endTime: number | null;
+
+    constructor(callId: string, endTime: number | null) {
+        this.callId = callId;
+        this.endTime = endTime;
+    }
+}
+
 /**
  * Given a side from the Side enum, het the otherwise
  *
@@ -374,6 +411,13 @@ export class User extends CompassObject {
      * The email address of the user.
      */
     public contact: string;
+
+    /**
+     * The status of the user.
+     *
+     * Supported since Compass r-2020b
+     */
+    public status: UserStatus;
 
     /**
      * Get the queues that the user is logged on to.

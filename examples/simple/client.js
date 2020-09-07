@@ -32,6 +32,8 @@ promise.then(function () {
         console.log(`User ${event.emitter.name} (${event.emitter.id}) event: ${event.eventType}`);
         if (event.eventType === compass.EventType.PropertyChanged) {
             logPropertyChanged(event);
+        } else if (event.eventType === compass.EventType.Changed) {
+            console.log(event.data);
         }
     });
 
