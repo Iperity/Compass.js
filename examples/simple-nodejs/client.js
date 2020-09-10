@@ -23,7 +23,11 @@ async function main() {
     // We are connected and all data-models have been retrieved.
     console.log("Connected!");
 
-    // Let's try a REST request too
+    // Get the api-version
+    const version = await conn.rest.getApiVersion();
+    console.log("Found API version", version);
+      
+    // Retrieve user
     const restUser = await conn.rest.getMyUser();
     console.log("Got REST user: ", restUser);
 

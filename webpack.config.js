@@ -1,6 +1,9 @@
-const DtsBundleWebpack = require('dts-bundle-webpack');
 const webpackRxjsExternals = require('webpack-rxjs-externals');
 const path = require('path');
+// This is a fork of declaration-bundler-webpack-plugin
+// Importantly, this fork doesn't output lines like "import { RestApi } from "./RestApi" in the .d.ts file,
+// which will give weird errors for consumers of the typing files.
+var TypescriptDeclarationGenerator = require('bundle-dts-webpack-plugin');
 
 const IS_CI = !!process.env.CI;
 
@@ -30,18 +33,19 @@ module.exports = {
 
             {
                 test: /\.tsx?$/,
-                loader: 'awesome-typescript-loader',
+                use: [{
+                    loader: 'babel-loader'
+                }, {
+                    loader: 'ts-loader'
+                }]
             },
         ],
     },
 
     plugins: [
-        new DtsBundleWebpack({
-            name: 'compass.js',
-            main: path.resolve(__dirname, 'build') + '/types/Compass.d.ts',
-            out: path.resolve(__dirname, 'build') + '/Compass.d.ts',
-            outputAsModuleFolder: true, // to use npm in-package typings,
-            removeSource: true,
+        new TypescriptDeclarationGenerator({
+            moduleName: '"compass.js"',
+            out: 'Compass.d.ts',
         })
     ]
 };

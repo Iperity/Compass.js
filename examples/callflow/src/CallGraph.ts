@@ -27,7 +27,6 @@ export class CallGraph {
 
     constructor(call: Call) {
         this.call = call;
-        this.handleStart();
     }
 
     startCall() {

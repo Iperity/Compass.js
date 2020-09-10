@@ -253,7 +253,7 @@ export class Connection {
      * Called when subscribed to pubsub. Gets users, queues, and currently running calls.
      */
     private _onSubscribed(password): Promise<void[]> {
-        const promises: Array<Promise<void>> = [];
+        const promises: Promise<void>[] = [];
 
         // get the list of users in the company.
         promises.push(this._getObjectsOfType('user')

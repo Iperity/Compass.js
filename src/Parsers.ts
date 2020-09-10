@@ -3,6 +3,7 @@
  */
 
 import {
+    ReceiveCalls,
     Call,
     CallPoint,
     CallPointState,
@@ -20,6 +21,8 @@ import {
     ResourceType,
     User,
     UserCallPoint,
+    UserStatus,
+    WrapupState,
 } from "./Model";
 import {Model} from "./Model";
 import {compassLogger} from "./Logging";
@@ -104,6 +107,15 @@ class UserParser implements IParser {
         user.phoneId = parseNumberOrNull(elem.find('>location').text());
         user.contact = elem.find('>contact').text();
         user.language = elem.find('>language').text() as Language;
+        // compass r-2020b
+        if (elem.find('>receiveCalls').length) {
+            user.status = new UserStatus(
+                elem.find('>receiveCalls').text() as ReceiveCalls,
+                elem.find('>displayStatus').text(),
+                parseWrapupState(elem.find('>wrapupState')),
+            );
+        }
+
         return user;
     }
 }
@@ -266,4 +278,12 @@ export function parseNumberOrNull(val: string) {
 
 export function parseBoolean(val: string) {
     return val === 'true';
+}
+
+export function parseWrapupState(elem: JQuery) {
+    if (!elem.length) return null;
+
+    const callId = elem.find('>callId').text();
+    const endTime = parseNumberOrNull(elem.find('>endTime').text());
+    return new WrapupState(callId, endTime);
 }
