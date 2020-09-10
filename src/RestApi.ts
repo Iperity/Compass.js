@@ -1,4 +1,3 @@
-import {compassLogger} from "./Logging";
 import * as $ from "jquery";
 import { b64EncodeUnicode } from "./Utils";
 
@@ -128,6 +127,7 @@ export class RestApi {
             dataFilter: (response) => response === '' ? '{}' : response,
         });
 
+        // convert jQuery deferred to a promise
         return new Promise((resolve, reject) => {
             deferred.then(resolve, reject);
         });
