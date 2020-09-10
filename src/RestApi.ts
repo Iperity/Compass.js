@@ -1,4 +1,3 @@
-import {compassLogger} from "./Logging";
 import * as $ from "jquery";
 import { b64EncodeUnicode } from "./Utils";
 
@@ -126,12 +125,12 @@ export class RestApi {
             // by default, jQuery treats empty response as an error,
             // but Compass API has 'void' methods.
             dataFilter: (response) => response === '' ? '{}' : response,
-        })
-            .fail((jqXHR, textStatus, _errorThrown) => {
-                compassLogger.warn(`REST ${method} request to ${url} with data ${JSON.stringify(data)} failed with error: ${textStatus}`);
-            });
-        // convert jquery deferred to promise
-        return Promise.resolve(deferred);
+        });
+
+        // convert jQuery deferred to a promise
+        return new Promise((resolve, reject) => {
+            deferred.then(resolve, reject);
+        });
     }
 
     /**
