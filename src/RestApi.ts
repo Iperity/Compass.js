@@ -126,12 +126,11 @@ export class RestApi {
             // by default, jQuery treats empty response as an error,
             // but Compass API has 'void' methods.
             dataFilter: (response) => response === '' ? '{}' : response,
-        })
-            .fail((jqXHR, textStatus, _errorThrown) => {
-                compassLogger.warn(`REST ${method} request to ${url} with data ${JSON.stringify(data)} failed with error: ${textStatus}`);
-            });
-        // convert jquery deferred to promise
-        return Promise.resolve(deferred);
+        });
+
+        return new Promise((resolve, reject) => {
+            deferred.then(resolve, reject);
+        });
     }
 
     /**
