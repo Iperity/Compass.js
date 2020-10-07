@@ -141,6 +141,7 @@ Publishing
 
 If you haven't logged on to the npm cli yet, it will prompt you to do so when running the last step.
 
+After releasing, update the `package.json` files in the examples folder to match the new Compass.js version. 
  
 Documentation & Examples
 ---------

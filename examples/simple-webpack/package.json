@@ -15,7 +15,7 @@
     "dts-bundle-webpack": "^1.0.2"
   },
   "dependencies": {
-    "compass.js": "^1.2.3",
+    "compass.js": "^1.3.0",
     "jquery": "^3.3.1",
     "rxjs": "^6.3.3",
     "strophe.js": "^1.3.0",
