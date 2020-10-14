@@ -16,6 +16,13 @@ module.exports = {
         libraryTarget: 'umd'
     },
 
+    optimization: {
+        // Make sure we don't mangle classnames; this lets javascript see the typescript class names
+        // for example, console.log(event.source) will describe the actual compass objects
+        // When updating to Webpack 5, use mangleExports: false
+        minimize: false,
+    },
+
     resolve: {
         extensions: [ '.tsx', '.ts', '.js' ],
     },
