@@ -7,6 +7,12 @@ environment:
     - job_name: Simple NodeJS
       appveyor_build_worker_image: Ubuntu
 
+    - job_name: Simple Typescript
+      appveyor_build_worker_image: Ubuntu
+
+    - job_name: Simple Webpack
+      appveyor_build_worker_image: Ubuntu
+
 matrix:
   fast_finish: true
 
@@ -34,13 +40,13 @@ for:
         type: zip
 
   -
-    environment:
-      USERNAME: compassjs-ci-user
-      BASEDOM: apollo.compass-stack.com
-
     matrix:
       only:
         - job_name: Simple NodeJS
+
+    environment:
+      USERNAME: compassjs-ci-user
+      BASEDOM: apollo.compass-stack.com
 
     build_script:
     - sh: cd examples/simple-nodejs
@@ -50,4 +56,52 @@ for:
     - sh: "echo \"const config = { basedom: '$BASEDOM', jid: '$USERNAME@uc.$BASEDOM', password: '$CI_USER_PASSWORD' }; module.exports = config;\" > config.js"
 
     cache:
-      - examples/simple-nodejs/node_modules -> package.json
+      - examples/simple-nodejs/node_modules -> examples/simple-nodejs/package.json
+
+  -
+    matrix:
+      only:
+        - job_name: Simple Typescript
+
+    environment:
+      USERNAME: compassjs-ci-user
+      BASEDOM: apollo.compass-stack.com
+
+    build_script:
+    - sh: cd examples/simple-typescript
+    - sh: nvm install $nodejs_version
+    - sh: npm install
+    - sh: "echo \"const config = { basedom: '$BASEDOM', jid: '$USERNAME@uc.$BASEDOM', password: '$CI_USER_PASSWORD' }; module.exports = config;\" > config.js"
+    - sh: npm run build
+
+    cache:
+      - examples/simple-typescript/node_modules -> examples/simple-typescript/package.json
+    
+    artifacts:
+      - path: examples/simple-typescript/dist
+        name: simple-typescript-build
+        type: zip
+
+  -
+    environment:
+      USERNAME: compassjs-ci-user
+      BASEDOM: apollo.compass-stack.com
+
+    matrix:
+      only:
+        - job_name: Simple Webpack
+
+    build_script:
+    - sh: cd examples/simple-webpack
+    - sh: nvm install $nodejs_version
+    - sh: npm install
+    - sh: "echo \"const config = { basedom: '$BASEDOM', jid: '$USERNAME@uc.$BASEDOM', password: '$CI_USER_PASSWORD' }; module.exports = config;\" > config.js"
+    - sh: pwd && NODE_DEBUG=module npm run-script build
+
+    cache:
+      - examples/simple-webpack/node_modules -> examples/simple-webpack/package.json
+    
+    artifacts:
+      - path: examples/simple-webpack/dist
+        name: simple-webpack-build
+        type: zip
