@@ -46,7 +46,7 @@ for:
     - sh: cd examples/simple-nodejs
     - sh: nvm install $nodejs_version
     - sh: npm install
-    - sh: (cd ../.. && sudo npm link) && link compass.js
+    - sh: (cd ../.. && npm link) && npm link compass.js
     - sh: "echo \"const config = { basedom: '$BASEDOM', jid: '$USERNAME@uc.$BASEDOM', password: '$CI_USER_PASSWORD' }; module.exports = config;\" > config.js"
 
     cache:
