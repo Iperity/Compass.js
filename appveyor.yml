@@ -55,9 +55,6 @@ for:
     - sh: (cd ../.. && npm link) && npm link compass.js
     - sh: "echo \"const config = { basedom: '$BASEDOM', jid: '$USERNAME@uc.$BASEDOM', password: '$CI_USER_PASSWORD' }; module.exports = config;\" > config.js"
 
-    cache:
-      - examples/simple-nodejs/node_modules -> examples/simple-nodejs/package.json
-
   -
     matrix:
       only:
