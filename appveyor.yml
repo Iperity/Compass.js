@@ -4,6 +4,9 @@ environment:
     - job_name: Build
       appveyor_build_worker_image: Ubuntu
 
+    - job_name: Simple NodeJS
+      appveyor_build_worker_image: Ubuntu
+
 matrix:
   fast_finish: true
 
@@ -15,9 +18,11 @@ for:
     matrix:
       only:
         - job_name: Build
+
     build_script:
     - sh: nvm install $nodejs_version
     - sh: npm install
+    - sh: npm test
     - sh: NODE_ENV=production npm run build-ci
 
     cache:
@@ -27,3 +32,22 @@ for:
       - path: build
         name: build
         type: zip
+
+  -
+    environment:
+      USERNAME: compassjs-ci-user
+      BASEDOM: apollo.compass-stack.com
+
+    matrix:
+      only:
+        - job_name: Simple NodeJS
+
+      build_script:
+      - sh: cd examples/simple-nodejs
+      - sh: nvm install $nodejs_version
+      - sh: npm install
+      - sh: (cd ../.. && sudo npm link) && npm link compass.js
+      - sh: "echo \"const config = { basedom: '$BASEDOM', jid: '$USERNAME@uc.$BASEDOM', password: '$CI_USER_PASSWORD' }; module.exports = config;\" > config.js"
+
+      cache:
+        - examples/simple-nodejs/node_modules -> package.json
