@@ -1,0 +1,29 @@
+environment:
+  nodejs_version: 10
+  matrix:
+    - job_name: Build
+      appveyor_build_worker_image: Ubuntu
+
+matrix:
+  fast_finish: true
+
+init:
+  - appveyor version
+
+for:
+  -
+    matrix:
+      only:
+        - job_name: Build
+    build_script:
+    - sh: nvm install $nodejs_version
+    - sh: npm install
+    - sh: NODE_ENV=production npm run build-ci
+
+    cache:
+      - node_modules -> package.json
+
+    artifacts:
+      - path: build
+        name: build
+        type: zip
