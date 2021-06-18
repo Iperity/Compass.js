@@ -1,0 +1,104 @@
+environment:
+  nodejs_version: 10
+  matrix:
+    - job_name: Build
+      appveyor_build_worker_image: Ubuntu
+
+    - job_name: Simple NodeJS
+      appveyor_build_worker_image: Ubuntu
+
+    - job_name: Simple Typescript
+      appveyor_build_worker_image: Ubuntu
+
+    - job_name: Simple Webpack
+      appveyor_build_worker_image: Ubuntu
+
+matrix:
+  fast_finish: true
+
+init:
+  - appveyor version
+
+for:
+  -
+    matrix:
+      only:
+        - job_name: Build
+
+    build_script:
+    - sh: nvm install $nodejs_version
+    - sh: npm install
+    - sh: npm test
+    - sh: NODE_ENV=production npm run build-ci
+
+    cache:
+      - node_modules -> package.json
+
+    artifacts:
+      - path: build
+        name: build
+        type: zip
+
+  -
+    matrix:
+      only:
+        - job_name: Simple NodeJS
+
+    environment:
+      USERNAME: compassjs-ci-user
+      BASEDOM: apollo.compass-stack.com
+
+    build_script:
+    - sh: cd examples/simple-nodejs
+    - sh: nvm install $nodejs_version
+    - sh: npm install
+    - sh: (cd ../.. && npm link) && npm link compass.js
+    - sh: "echo \"const config = { basedom: '$BASEDOM', jid: '$USERNAME@uc.$BASEDOM', password: '$CI_USER_PASSWORD' }; module.exports = config;\" > config.js"
+
+  -
+    matrix:
+      only:
+        - job_name: Simple Typescript
+
+    environment:
+      USERNAME: compassjs-ci-user
+      BASEDOM: apollo.compass-stack.com
+
+    build_script:
+    - sh: cd examples/simple-typescript
+    - sh: nvm install $nodejs_version
+    - sh: npm install
+    - sh: "echo \"const config = { basedom: '$BASEDOM', jid: '$USERNAME@uc.$BASEDOM', password: '$CI_USER_PASSWORD' }; module.exports = config;\" > config.js"
+    - sh: npm run build
+
+    cache:
+      - examples/simple-typescript/node_modules -> examples/simple-typescript/package.json
+    
+    artifacts:
+      - path: examples/simple-typescript/dist
+        name: simple-typescript-build
+        type: zip
+
+  -
+    matrix:
+      only:
+        - job_name: Simple Webpack
+
+    environment:
+      USERNAME: compassjs-ci-user
+      BASEDOM: apollo.compass-stack.com
+
+    build_script:
+    - sh: cd examples/simple-webpack
+    - sh: nvm install $nodejs_version
+    - sh: npm install
+    - sh: "echo \"const config = { basedom: '$BASEDOM', jid: '$USERNAME@uc.$BASEDOM', password: '$CI_USER_PASSWORD' }; module.exports = config;\" > config.js"
+    - sh: pwd && NODE_DEBUG=module npm run-script build
+
+    cache:
+      - examples/simple-webpack/node_modules -> examples/simple-webpack/package.json
+    
+    artifacts:
+      - path: examples/simple-webpack/dist
+        name: simple-webpack-build
+        type: zip
