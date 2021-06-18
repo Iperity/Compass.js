@@ -80,13 +80,13 @@ for:
         type: zip
 
   -
-    environment:
-      USERNAME: compassjs-ci-user
-      BASEDOM: apollo.compass-stack.com
-
     matrix:
       only:
         - job_name: Simple Webpack
+
+    environment:
+      USERNAME: compassjs-ci-user
+      BASEDOM: apollo.compass-stack.com
 
     build_script:
     - sh: cd examples/simple-webpack
