@@ -396,8 +396,11 @@ class XmppNotificationHandler {
             case 'notification.call.stepresult':
                 this.handleCallStepResultNotification(not);
                 break;
+            case 'notification.call.queueExit':
+                this.handleQueueExitNotification(not);
+                break;
             default:
-                compassLogger.warn(`Don't know how to handle notification type ${type} .`);
+                compassLogger.warn(`Don't know how to handle notification type ${type}.`);
                 break;
         }
     }
@@ -533,6 +536,24 @@ class XmppNotificationHandler {
             side: convertCallSide(side),
             callpoint: callpoint,
             result: result,
+        }));
+    }
+
+    protected handleQueueExitNotification(not: JQuery) {
+        compassLogger.debug("QueueExit notification received");
+
+        const callId = not.find('>callId').text();
+        const call = this._xmppHandler.model.calls[callId];
+        if (!call) {
+            compassLogger.warn(`Received queueExit notification for call ${callId} we don't know about.`);
+            return;
+        }
+
+        const queueExit = not.find('>queueExit').text();
+
+        call.domain.notify(new Event(call, EventType.Changed, {
+            updateType: 'queueExit',
+            queueExit: queueExit,
         }));
     }
 

@@ -69,6 +69,9 @@ promise.then(function () {
                         const rp = event.data.callpoint;
                         details = 'choice "' + rp.name + '" result ' + event.data.result;
                         break;
+                    case 'queueExit':
+                        details = `queue exited with reason ${event.data.queueExit}`;
+                        break;
                     default:
                         details = event.data.updateType;
                         break;
