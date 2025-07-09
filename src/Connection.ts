@@ -261,7 +261,11 @@ export class Connection {
                 this._xmppHandler.setUsersFromXmpp(res);
                 const username = this.model.getUserForJid(this.jid).username;
                 this.rest = new RestApi(this.basedom, username, password);
-            }));
+
+                // Fetch user identities for recording filtering
+                return this._loadUserIdentities();
+            })
+        );
         // get the list of queues in the company.
         promises.push(this._getObjectsOfType('queue')
             .then((res) => {
@@ -274,6 +278,40 @@ export class Connection {
             }));
 
         return Promise.all(promises);
+    }
+
+    /*
+     * Load the current user's identities from the REST API and store them in the model
+     * for filtering recordings.
+     */
+    private _loadUserIdentities(): Promise<void> {
+        if (!this.rest) {
+            compassLogger.warn(
+                "REST API not initialized, cannot load user identities"
+            );
+            return Promise.resolve();
+        }
+
+        return this.rest
+            .getMyUser()
+            .then((user) => this.rest.get(`${user.self}/identities`))
+            .then((identities) => {
+                // Clear existing identities
+                this.model.clearUserIdentities();
+
+                // Add each identity ID to the model
+                identities.forEach((identity) => {
+                    this.model.addUserIdentity(identity.identityId);
+                });
+
+                compassLogger.info(
+                    `Loaded ${this.model.userIdentityIds.size} user identities for recording filtering`
+                );
+            })
+            .catch((error) => {
+                compassLogger.warn("Failed to load user identities:", error);
+                // Don't fail the entire connection process if identity loading fails
+            });
     }
 
     /*

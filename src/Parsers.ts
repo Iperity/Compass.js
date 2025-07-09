@@ -13,10 +13,12 @@ import {
     CompassObject,
     DialplanCallPoint,
     ExternalCallPoint,
-    Language, ListenInCallPoint,
+    Language,
+    ListenInCallPoint,
     Queue,
     QueueCallPoint,
     QueueMember,
+    Recording,
     ResourceCallPoint,
     ResourceType,
     User,
@@ -48,9 +50,13 @@ class ParserContext {
 }
 
 export enum ObjectType {
-    Company, User, Queue, Call, CallPoint,
+    Company,
+    User,
+    Queue,
+    Call,
+    CallPoint,
+    Recording,
 }
-
 
 /*
  * Parses XML objects, passes objects on to the right Parser based on type.
@@ -87,7 +93,8 @@ export class ParserRegistry {
     // Map of all available parsers, stored by type that they parse.
     private static readonly _parsers: {[type: string]: IParser} = {};
 
-    public static registerParser(parser: IParser, type: ObjectType) {  // add a parser to the parser-set.
+    public static registerParser(parser: IParser, type: ObjectType) {
+        // add a parser to the parser-set.
         ParserRegistry._parsers[type] = parser;
     }
 }
@@ -269,6 +276,27 @@ class ListenInCallPointParser implements ICallPointSubtypeParser {
     }
 }
 CallPointParser.register(new ListenInCallPointParser(), CallPointType.listenIn);
+
+// ============================ Recording ============================
+
+class RecordingParser implements IParser {
+    public parse(elem: JQuery, parserContext: ParserContext): CompassObject {
+        const id = elem.attr("id");
+        const recording = new Recording(id, elem, parserContext.model);
+        recording.identityId = parseNumberOrNull(elem.find(">identityId").text());
+        recording.resourceId = parseNumberOrNull(elem.find(">resourceId").text());
+        recording.callId = elem.find(">callId").text();
+        recording.startTime = new Date(elem.find(">startTime").text());
+        recording.endTime = new Date(elem.find(">endTime").text());
+        recording.duration =
+            parseNumberOrNull(elem.find(">duration").text()) || 0;
+        recording.callerId = elem.find(">callerId").text();
+        recording.calleeId = elem.find(">calleeId").text();
+        recording.inbound = parseBoolean(elem.find(">inbound").text());
+        return recording;
+    }
+}
+ParserRegistry.registerParser(new RecordingParser(), ObjectType.Recording);
 
 // // ============================ Utilities ============================
 

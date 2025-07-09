@@ -11,6 +11,7 @@ import {
     Queue,
     QueueCallPoint,
     QueueMember,
+    Recording,
     Side,
     User,
     UserCallPoint,
@@ -208,6 +209,31 @@ export class XmppHandler {
     }
 
     /**
+     * Add a recording to the model.
+     * @param {Recording} recording - the recording to add.
+     * @param {boolean} [sendNotification] - set to true to notify observers. Default: true
+     */
+    public addRecording(recording: Recording, sendNotification = true) {
+        this.model.recordings[recording.id] = recording;
+        if (sendNotification) {
+            this.model.notify(new Event(recording, EventType.Added));
+        }
+    }
+
+    /**
+     * Remove a recording from the model
+     * @param {string} recordingId - the recordingId of the recording to remove.
+     * @param {boolean} [sendNotification] - set to true to notify observers. Default: true
+     */
+    public removeRecording(recordingId: string, sendNotification = true) {
+        const recording = this.model.recordings[recordingId];
+        if (!recording) return;
+        delete this.model.recordings[recordingId];
+        if (sendNotification)
+            this.model.notify(new Event(recording, EventType.Removed));
+    }
+
+    /**
      * Utility function to remove an element from an array.
      * @param arr - the array to remove the element from.
      * @param element - the element to be removed
@@ -372,6 +398,9 @@ class XmppNotificationHandler {
                 break;
             case 'notification.user':
                 this.handleUserNotification(not);
+                break;
+            case "notification.recording":
+                this.handleRecordingNotification(not);
                 break;
             default:
                 compassLogger.warn(`Don't know how to handle notification type ${type} .`);
@@ -709,7 +738,50 @@ class XmppNotificationHandler {
                     compassLogger.warn(`Notification ${type} for queue ${queueId} not processed, becasue queue not found in domain.`);
                     break;
             }
+        }
+    }
 
+    protected handleRecordingNotification(not: JQuery) {
+        compassLogger.debug("Recording Notification Received");
+        const type = not.attr("type");
+        const typeLevel = this.getNotificationTypeUpToLevel(type, 2);
+
+        switch (typeLevel) {
+            case "notification.recording.create":
+                this.handleRecordingCreateNotification(not);
+                break;
+            default:
+                compassLogger.warn(
+                    `Don't know how to handle notification type ${type} .`
+                );
+                break;
+        }
+    }
+
+    protected handleRecordingCreateNotification(not: JQuery) {
+        compassLogger.debug("Recording Create Notification Received");
+        const recordingElem = not.find(">recording");
+        const recording = this._parser.parse(
+            recordingElem,
+            ObjectType.Recording
+        ) as Recording;
+
+        // Only process recordings with identityId that belongs to the current user
+        if (recording.identityId) {
+            if (this._xmppHandler.model.isUserIdentity(recording.identityId)) {
+                this._xmppHandler.addRecording(recording, true);
+                compassLogger.debug(
+                    `Added recording ${recording.id} for user identity ${recording.identityId}`
+                );
+            } else {
+                compassLogger.debug(
+                    `Skipping recording ${recording.id} - identityId ${recording.identityId} does not belong to current user`
+                );
+            }
+        } else {
+            compassLogger.debug(
+                `Skipping recording ${recording.id} - no valid identityId (resourceId: ${recording.resourceId})`
+            );
         }
     }
 

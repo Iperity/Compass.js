@@ -446,6 +446,23 @@ const xmlQueueMemberUnpauseNotification = $.parseXML('<notification xmlns="http:
     '       </member>' +
     '</notification>',
 ).documentElement;
+const xmlRecordingCreateNotification = $.parseXML(
+    '<notification xmlns="http://iperity.com/compass" xmlns:xsi="' +
+        'http://www.w3.org/2001/XMLSchema-instance" xsi:type="recordingCreateNotification" ' +
+        'type="notification.recording.create" timestamp="1752085025">' +
+        "<recordingId>7</recordingId>" +
+        '<recording id="7">' +
+        "<identityId>88</identityId>" +
+        "<callId>cf8846c9f78b62fbc07329bc42fc17d337242086</callId>" +
+        "<startTime>2025-07-09T18:16:59Z</startTime>" +
+        "<endTime>2025-07-09T18:17:04.966Z</endTime>" +
+        "<duration>5</duration>" +
+        "<callerId>202</callerId>" +
+        "<calleeId>200</calleeId>" +
+        "<inbound>true</inbound>" +
+        "</recording>" +
+        "</notification>"
+).documentElement;
 
 // Tests
 
@@ -1077,5 +1094,68 @@ describe('XmppHandler :: Queue', () => {
         expect(event.eventType).equals(EventType.Removed);
         const q = event.emitter as Queue;
         expect(q.id).equals(queueId);
+    });
+});
+
+describe("XmppHandler :: Recording", () => {
+    it("notification.recording.create (user identity)", () => {
+        const xmppHandler = getEmptyXmppHandler();
+        const model = xmppHandler.model;
+
+        // Add the identity ID to the user's identities (simulating API load)
+        model.addUserIdentity(88);
+
+        // Set up event recorder for recordings
+        const recordingEvents = new EventRecorder(model.recordingsObservable);
+
+        // Process recording notification
+        const xmlNotification = $(xmlRecordingCreateNotification);
+        xmppHandler.handleNotification(xmlNotification);
+
+        // Check that recording was added to model
+        const recordingId = "7";
+        expect(model.recordings[recordingId]).to.not.be.undefined;
+
+        const recording = model.recordings[recordingId];
+        expect(recording.id).equals("7");
+        expect(recording.identityId).equals(88);
+        expect(recording.resourceId).equals(null);
+        expect(recording.callId).equals(
+            "cf8846c9f78b62fbc07329bc42fc17d337242086"
+        );
+        expect(recording.startTime.getDate()).equals(9);
+        expect(recording.endTime.getUTCHours()).equals(18);
+        expect(recording.duration).equals(5);
+        expect(recording.callerId).equals("202");
+        expect(recording.calleeId).equals("200");
+        expect(recording.inbound).equals(true);
+
+        // Check that event was fired
+        expect(recordingEvents.size()).equals(1);
+        const event = recordingEvents.next();
+        expect(event.eventType).equals(EventType.Added);
+        expect(event.emitter).equals(recording);
+    });
+
+    it("notification.recording.create (non-user identity - should be ignored)", () => {
+        const xmppHandler = getEmptyXmppHandler();
+        const model = xmppHandler.model;
+
+        // Don't add the identity ID to user's identities
+        // model.addUserIdentity(88); // This is commented out
+
+        // Set up event recorder for recordings
+        const recordingEvents = new EventRecorder(model.recordingsObservable);
+
+        // Process recording notification
+        const xmlNotification = $(xmlRecordingCreateNotification);
+        xmppHandler.handleNotification(xmlNotification);
+
+        // Check that recording was NOT added to model
+        const recordingId = "7";
+        expect(model.recordings[recordingId]).to.be.undefined;
+
+        // Check that no event was fired
+        expect(recordingEvents.size()).equals(0);
     });
 });

@@ -624,6 +624,56 @@ export class Queue extends CompassObject {
 }
 
 /**
+ * Class for objects representing a Recording.
+ */
+export class Recording extends CompassObject {
+    /**
+     * The identity ID associated with the recording (if any).
+     */
+    public identityId: number;
+
+    /**
+     * The resource ID associated with the recording (if any).
+     */
+    public resourceId: number;
+
+    /**
+     * The call ID that this recording belongs to.
+     */
+    public callId: string;
+
+    /**
+     * The start time of the recording (ISO 8601 format).
+     */
+    public startTime: Date;
+
+    /**
+     * The end time of the recording (ISO 8601 format).
+     */
+    public endTime: Date;
+
+    /**
+     * The duration of the recording in seconds.
+     */
+    public duration: number;
+
+    /**
+     * The caller ID.
+     */
+    public callerId: string;
+
+    /**
+     * The callee ID.
+     */
+    public calleeId: string;
+
+    /**
+     * Whether this was an inbound call.
+     */
+    public inbound: boolean;
+}
+
+/**
  * The model, representing the state of a Company on the Compass platform.
  */
 export class Model {
@@ -644,6 +694,15 @@ export class Model {
      */
     public queues: { [id: string]: Queue };
     /**
+     * All recordings in the company.
+     */
+    public recordings: { [id: string]: Recording };
+    /**
+     * Set of identity IDs that belong to the current user.
+     * Used to filter recordings to only include those belonging to the user.
+     */
+    public userIdentityIds: Set<number> = new Set();
+    /**
      * An observable that triggers when a call-related event occurs.
      */
     public callsObservable: Observable<Event>;
@@ -655,6 +714,10 @@ export class Model {
      * An observable that triggers when a queue-related event occurs.
      */
     public queuesObservable: Observable<Event>;
+    /**
+     * An observable that triggers when a recording-related event occurs.
+     */
+    public recordingsObservable: Observable<Event>;
 
     /**
      * Construct the Model object.
@@ -664,18 +727,23 @@ export class Model {
         this.callsObservable = this.callsSubject.asObservable();
         this.usersObservable = this.usersSubject.asObservable();
         this.queuesObservable = this.queuesSubject.asObservable();
+        this.recordingsObservable = this.recordingsSubject.asObservable();
         this.calls = {};
         this.users = {};
         this.queues = {};
+        this.recordings = {};
     }
 
     /**
-     * Send an event with 'Invalidated' event-type on all three observables, called when connected or reconnected.
+     * Send an event with 'Invalidated' event-type on all observables, called when connected or reconnected.
      */
     public notifyConnected() {
         this.usersSubject.next(new Event(null, EventType.Invalidated, null));
         this.queuesSubject.next(new Event(null, EventType.Invalidated, null));
         this.callsSubject.next(new Event(null, EventType.Invalidated, null));
+        this.recordingsSubject.next(
+            new Event(null, EventType.Invalidated, null)
+        );
     }
 
 
@@ -689,6 +757,38 @@ export class Model {
     }
 
     /**
+     * Check if an identity ID belongs to the current user.
+     * @param identityId - The identity ID to check.
+     * @returns True if the identity belongs to the current user, false otherwise.
+     */
+    public isUserIdentity(identityId: number): boolean {
+        return this.userIdentityIds.has(identityId);
+    }
+
+    /**
+     * Add an identity ID to the current user's identity set.
+     * @param identityId - The identity ID to add.
+     */
+    public addUserIdentity(identityId: number): void {
+        this.userIdentityIds.add(identityId);
+    }
+
+    /**
+     * Remove an identity ID from the current user's identity set.
+     * @param identityId - The identity ID to remove.
+     */
+    public removeUserIdentity(identityId: number): void {
+        this.userIdentityIds.delete(identityId);
+    }
+
+    /**
+     * Clear all user identity IDs.
+     */
+    public clearUserIdentities(): void {
+        this.userIdentityIds.clear();
+    }
+
+    /**
      * Send an event
      * @param e - the event to send.
      */
@@ -699,6 +799,8 @@ export class Model {
             this.callsSubject.next(e);
         } else if (e.emitter instanceof User) {
             this.usersSubject.next(e);
+        } else if (e.emitter instanceof Recording) {
+            this.recordingsSubject.next(e);
         } else {
             throw new Error("Invalid emitter: " + e.emitter);
         }
@@ -713,6 +815,9 @@ export class Model {
         
         this.queues = {};
         this.queuesSubject.complete();
+
+        this.recordings = {};
+        this.recordingsSubject.complete();
     }
 
     // privates
@@ -720,6 +825,7 @@ export class Model {
     private usersSubject: Subject<Event> = new Subject();
     private callsSubject: Subject<Event> = new Subject();
     private queuesSubject: Subject<Event> = new Subject();
+    private recordingsSubject: Subject<Event> = new Subject();
 }
 
 /**

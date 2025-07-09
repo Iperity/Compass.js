@@ -47,6 +47,14 @@ promise.then(function () {
         }
     });
 
+    // Listen to the recording-list
+    conn.model.recordingsObservable.subscribe(event => {
+        if (!event.emitter) return; // reconnect events
+
+        console.log(`Recording ${event.emitter.id} event: ${event.eventType}`);
+        
+    });
+
     // Listen to the call-list
     conn.model.callsObservable.subscribe(event => {
         if (!event.emitter) return; // reconnect events
