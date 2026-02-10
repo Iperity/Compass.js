@@ -1,6 +1,6 @@
 import {Connection} from "../src/Connection";
 import {Model} from "../src/Model";
-import { User, Queue, QueueMember, Call, CallState, CallPointState, UserCallPoint, QueueCallPoint} from "../src/Model";
+import { User, Queue, QueueMember, Call, CallState, CallPointState, UserCallPoint, QueueCallPoint, Voicemail, VoicemailMessage} from "../src/Model";
 import { expect } from 'chai';
 
 /* Constants */
@@ -227,5 +227,46 @@ describe('Model :: QueueMember', () => {
         const queue2 = model.queues[QUEUE_ID_2];
         const queue2Member = queue2.getQueueMember(USER_ID_1);
         expect(queue2Member.getQueue()).to.equal(model.queues[QUEUE_ID_2]);
+    });
+});
+
+const VOICEMAIL_ID_1 = "754211";
+const VOICEMAIL_NAME_1 = "Test Voicemail Box";
+
+describe('Model :: Voicemail', () => {
+    it('properties', () => {
+        const connection: Connection = new Connection('test.com');
+        const model = new Model();
+    
+        // Voicemail
+        const voicemail = new Voicemail(VOICEMAIL_ID_1, null, model);
+        voicemail.name = VOICEMAIL_NAME_1;
+        model.voicemails[voicemail.id] = voicemail;
+
+        expect(voicemail.id).to.equal(VOICEMAIL_ID_1);
+        expect(voicemail.name).to.equal(VOICEMAIL_NAME_1);
+        expect(voicemail.messages.total).to.equal(0);
+        expect(voicemail.messages.content).to.be.empty;
+    });
+
+    it('addMessage', () => {
+        const connection: Connection = new Connection('test.com');
+        const model = new Model();
+    
+        // Voicemail
+        const voicemail = new Voicemail(VOICEMAIL_ID_1, null, model);
+        voicemail.name = VOICEMAIL_NAME_1;
+        model.voicemails[voicemail.id] = voicemail;
+        
+        const msg = new VoicemailMessage("msg1", null, model);
+        msg.voicemailId = parseInt(VOICEMAIL_ID_1);
+        msg.callerId = "123456789";
+        
+        voicemail.messages.content.push(msg);
+        voicemail.messages.total = 1;
+
+        expect(voicemail.messages.total).to.equal(1);
+        expect(voicemail.messages.content).to.contain(msg);
+        expect(voicemail.messages.content[0].callerId).to.equal("123456789");
     });
 });

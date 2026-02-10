@@ -5,7 +5,7 @@ import {
     CallPointType,
     ExternalCallPoint,
     UserCallPoint,
-    DialplanCallPoint, Call, Queue, QueueCallPoint, CallState, CallEndReason, ResourceCallPoint, Side, ReceiveCalls,
+    DialplanCallPoint, Call, Queue, QueueCallPoint, CallState, CallEndReason, ResourceCallPoint, Side, ReceiveCalls, Voicemail,
 } from "../src/Model";
 import {XmppHandler} from "../src/XmppHandler";
 import {Event, EventType} from "../src/Events";
@@ -1157,5 +1157,56 @@ describe("XmppHandler :: Recording", () => {
 
         // Check that no event was fired
         expect(recordingEvents.size()).equals(0);
+    });
+});
+
+const xmlVoicemailMessageCreateNotification = $.parseXML(
+    '<notification xmlns="http://iperity.com/compass" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ' +
+    'xsi:type="voicemailMessageCreateNotification" type="notification.voicemail.message.create" timestamp="12345">' +
+    '  <voicemailMessage id="msg-123">' +
+    '    <voicemailId>754211</voicemailId>' +
+    '    <callerId>123456</callerId>' +
+    '    <receivedAt>2023-01-01T12:00:00Z</receivedAt>' +
+    '    <duration>30</duration>' +
+    '    <isNew>true</isNew>' +
+    '  </voicemailMessage>' +
+    '</notification>'
+).documentElement;
+
+describe("XmppHandler :: Voicemail", () => {
+    it("notification.voicemail.message.create", () => {
+        const xmppHandler = getEmptyXmppHandler();
+        const model = xmppHandler.model;
+
+        // Setup: Add Voicemail to model
+        const voicemailId = "754211";
+        const voicemail = new Voicemail(voicemailId, null, model);
+        voicemail.name = "Test Box";
+        model.voicemails[voicemailId] = voicemail;
+
+        // Set up event recorder
+        const voicemailEvents = new EventRecorder(model.voicemailsObservable);
+
+        // Process notification
+        const xmlNotification = $(xmlVoicemailMessageCreateNotification);
+        xmppHandler.handleNotification(xmlNotification);
+
+        // Check that message was added to voicemail
+        expect(voicemail.messages.total).equals(1);
+        expect(voicemail.messages.content.length).equals(1);
+        
+        const msg = voicemail.messages.content[0];
+        expect(msg.id).equals("msg-123");
+        expect(msg.callerId).equals("123456");
+        expect(msg.duration).equals(30);
+        expect(msg.isNew).equals(true);
+
+        // Check that event was fired
+        expect(voicemailEvents.size()).equals(1);
+        const event = voicemailEvents.next();
+        expect(event.eventType).equals(EventType.Added);
+        // Note: The event emitter is the Voicemail object, and the data contains the message
+        expect(event.emitter).equals(voicemail);
+        expect(event.data.message).equals(msg);
     });
 });
