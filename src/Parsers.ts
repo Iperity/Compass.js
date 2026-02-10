@@ -24,6 +24,8 @@ import {
     User,
     UserCallPoint,
     UserStatus,
+    Voicemail,
+    VoicemailMessage,
     WrapupState,
 } from "./Model";
 import {Model} from "./Model";
@@ -56,6 +58,8 @@ export enum ObjectType {
     Call,
     CallPoint,
     Recording,
+    Voicemail,
+    VoicemailMessage,
 }
 
 /*
@@ -297,6 +301,34 @@ class RecordingParser implements IParser {
     }
 }
 ParserRegistry.registerParser(new RecordingParser(), ObjectType.Recording);
+
+// ============================ Voicemail ============================
+
+class VoicemailParser implements IParser {
+    public parse(elem: JQuery, parserContext: ParserContext): CompassObject {
+        const id = elem.attr("id");
+        const voicemail = new Voicemail(id, elem, parserContext.model);
+        voicemail.name = elem.find(">name").text();
+        return voicemail;
+    }
+}
+ParserRegistry.registerParser(new VoicemailParser(), ObjectType.Voicemail);
+
+// ============================ VoicemailMessage ============================
+
+class VoicemailMessageParser implements IParser {
+    public parse(elem: JQuery, parserContext: ParserContext): CompassObject {
+        const id = elem.attr("id");
+        const voicemailMessage = new VoicemailMessage(id, elem, parserContext.model);
+        voicemailMessage.voicemailId = parseNumberOrNull(elem.find(">voicemailId").text());
+        voicemailMessage.callerId = elem.find(">callerId").text();
+        voicemailMessage.receivedAt = new Date(elem.find(">receivedAt").text());
+        voicemailMessage.duration = parseNumberOrNull(elem.find(">duration").text()) || 0;
+        voicemailMessage.isNew = parseBoolean(elem.find(">isNew").text());
+        return voicemailMessage;
+    }
+}
+ParserRegistry.registerParser(new VoicemailMessageParser(), ObjectType.VoicemailMessage);
 
 // // ============================ Utilities ============================
 

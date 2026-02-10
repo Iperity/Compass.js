@@ -1,5 +1,5 @@
 import {randomstring} from "./Utils";
-import {Model} from "./Model";
+import {Model, Voicemail, VoicemailMessage} from "./Model";
 import {XmppHandler} from "./XmppHandler";
 import {RestApi} from "./RestApi";
 import {compassLogger} from "./Logging";
@@ -265,6 +265,10 @@ export class Connection {
                 // Fetch user identities for recording filtering
                 return this._loadUserIdentities();
             })
+            // get the list of voicemails in the company.
+            .then(() => {
+                return this._loadVoicemails();
+            })
         );
         // get the list of queues in the company.
         promises.push(this._getObjectsOfType('queue')
@@ -311,6 +315,63 @@ export class Connection {
             .catch((error) => {
                 compassLogger.warn("Failed to load user identities:", error);
                 // Don't fail the entire connection process if identity loading fails
+            });
+    }
+
+    private _loadVoicemails(): Promise<void> {
+        if (!this.rest) {
+            compassLogger.warn(
+                "REST API not initialized, cannot load voicemails"
+            );
+            return Promise.resolve();
+        }
+
+        return this.rest
+            .get(`company/${this.model.company.id}/voicemails`)
+            .then((voicemails) => {
+                // Clear existing voicemails
+                this.model.voicemails = {};
+
+                const promises = voicemails.map((v) => {
+                    const voicemail = new Voicemail(v.id || String(v.resourceId), null, this.model);
+                    voicemail.resourceId = v.resourceId;
+                    voicemail.name = v.name;
+                    voicemail.email = v.email;
+                    voicemail.promptId = v.promptId;
+                    voicemail.uniqueUsageCount = v.uniqueUsageCount;
+                    voicemail.associatedUsers = v.associatedUsers;
+
+                    return this.rest
+                        .get(`voicemail/${v.resourceId}/messages`)
+                        .then((page) => {
+                            page.content = page.content.map((vm) => {
+                                const voicemailMessage = new VoicemailMessage(String(vm.messageId), null, this.model);
+                                voicemailMessage.voicemailId = vm.voicemailId;
+                                voicemailMessage.callerId = vm.callerId;
+                                voicemailMessage.receivedAt = new Date(vm.receivedAt);
+                                voicemailMessage.duration = vm.durationSeconds;
+                                voicemailMessage.isNew = vm.isNew;
+                                return voicemailMessage;
+                            });
+                            voicemail.messages = page;
+                        })
+                        .catch((error) => {
+                            compassLogger.warn("Failed to load voicemail messages:", error);
+                        })
+                        .finally(() => {
+                            this.model.addVoicemail(voicemail, false);
+                        });
+                });
+
+                return Promise.all(promises).then(() => {
+                    compassLogger.info(
+                        `Loaded ${Object.keys(this.model.voicemails).length} voicemails`
+                    );
+                });
+            })
+            .catch((error) => {
+                compassLogger.warn("Failed to load voicemails:", error);
+                // Don't fail the entire connection process if voicemail loading fails
             });
     }
 

@@ -7,8 +7,8 @@ if (typeof config === 'undefined') {
 const conn  = new compass.Connection(config.basedom);
 
 // For debugging:
-// compass.compassLogger.setLevel(compass.compassLogger.levels.DEBUG);
-// conn.logXmpp = true;
+compass.compassLogger.setLevel(compass.compassLogger.levels.DEBUG);
+conn.logXmpp = true;
 
 const promise = conn.connect(config.jid, config.password);
 
@@ -24,6 +24,10 @@ promise.then(function () {
 
     console.log("Got the following calls:");
     display(conn.model.calls);
+
+    console.log("Got the following voicemails:");
+    display(conn.model.voicemails);
+
 
     // Listen to the userList
     conn.model.usersObservable.subscribe(event => {
@@ -52,6 +56,19 @@ promise.then(function () {
         if (!event.emitter) return; // reconnect events
 
         console.log(`Recording ${event.emitter.id} event: ${event.eventType}`);
+    });
+
+    // Listen to the voicemail-list
+    conn.model.voicemailsObservable.subscribe(event => {
+        if (!event.emitter) return; // reconnect events
+
+        console.log(`Voicemail ${event.emitter.id} event: ${event.eventType}`);
+
+        console.log(event);
+
+        console.log(`Voicemail ${event.emitter.id} has ${event.emitter.messages.total} messages`);
+
+        console.log(event.emitter.messages.content);
         
     });
 

@@ -673,6 +673,84 @@ export class Recording extends CompassObject {
     public inbound: boolean;
 }
 
+export class Page<T> {
+    /**
+     * The content of the page.
+     */
+    public content: T[] = [];
+    /**
+     * The number of items.
+     */
+    public total: number = 0;
+    /**
+     * The current page.
+     */
+    public page: number = 0;
+    /**
+     * The number of elements in the page.
+     */
+    public size: number = 20;
+}
+
+export class VoicemailMessage extends CompassObject {
+    /**
+     * The ID of the voicemail box.
+     */
+    public voicemailId: number;
+    /**
+     * The caller ID of the voicemail message.
+     */
+    public callerId: string;
+    /**
+     * The time when the voicemail message was received.
+     */
+    public receivedAt: Date;
+    /**
+     * The duration of the voicemail message in seconds.
+     */
+    public duration: number;
+    /**
+     * Whether the voicemail message is new.
+     */
+    public isNew: boolean;
+}
+
+export class Voicemail extends CompassObject {
+    /**
+     * The ID of the voicemail box.
+     */
+    public resourceId: number;
+    /**
+     *Name of the voicemail box.
+     */
+    public name: string;
+
+    /**
+     * The email address associated with the voicemail box.
+     */
+    public email: string;
+
+    /**
+     * The ID of the prompt associated with the voicemail box.
+     */
+    public promptId: number;
+
+    /**
+     * The number of unique users that have used this voicemail box.
+     */
+    public uniqueUsageCount: number;
+
+    /**
+     * The users associated with this voicemail box.
+     */
+    public associatedUsers: User[] = [];
+
+    /**
+     * Messages in the voicemail box.
+     */
+    public messages: Page<VoicemailMessage> = new Page<VoicemailMessage>();
+}
+
 /**
  * The model, representing the state of a Company on the Compass platform.
  */
@@ -698,6 +776,10 @@ export class Model {
      */
     public recordings: { [id: string]: Recording };
     /**
+     * All voicemails in the company.
+     */
+    public voicemails: { [id: string]: Voicemail };
+    /**
      * Set of identity IDs that belong to the current user.
      * Used to filter recordings to only include those belonging to the user.
      */
@@ -718,6 +800,11 @@ export class Model {
      * An observable that triggers when a recording-related event occurs.
      */
     public recordingsObservable: Observable<Event>;
+    /**
+     * An observable that triggers when a voicemail-related event occurs.
+     */
+    public voicemailsObservable: Observable<Event>;
+
 
     /**
      * Construct the Model object.
@@ -728,10 +815,12 @@ export class Model {
         this.usersObservable = this.usersSubject.asObservable();
         this.queuesObservable = this.queuesSubject.asObservable();
         this.recordingsObservable = this.recordingsSubject.asObservable();
+        this.voicemailsObservable = this.voicemailsSubject.asObservable();
         this.calls = {};
         this.users = {};
         this.queues = {};
         this.recordings = {};
+        this.voicemails = {};
     }
 
     /**
@@ -742,6 +831,9 @@ export class Model {
         this.queuesSubject.next(new Event(null, EventType.Invalidated, null));
         this.callsSubject.next(new Event(null, EventType.Invalidated, null));
         this.recordingsSubject.next(
+            new Event(null, EventType.Invalidated, null)
+        );
+        this.voicemailsSubject.next(
             new Event(null, EventType.Invalidated, null)
         );
     }
@@ -789,6 +881,20 @@ export class Model {
     }
 
     /**
+     * Add a voicemail to the model.
+     * @param voicemail - The voicemail to add.
+     * @param notify - Whether to notify the observers.
+     */
+    public addVoicemail(voicemail: Voicemail, notify: boolean = true): void {
+        this.voicemails[voicemail.resourceId] = voicemail;
+        if (notify) {
+            this.voicemailsSubject.next(
+                new Event(voicemail, EventType.Added, null)
+            );
+        }
+    }
+
+    /**
      * Send an event
      * @param e - the event to send.
      */
@@ -801,6 +907,8 @@ export class Model {
             this.usersSubject.next(e);
         } else if (e.emitter instanceof Recording) {
             this.recordingsSubject.next(e);
+        } else if (e.emitter instanceof Voicemail) {
+            this.voicemailsSubject.next(e);
         } else {
             throw new Error("Invalid emitter: " + e.emitter);
         }
@@ -818,6 +926,9 @@ export class Model {
 
         this.recordings = {};
         this.recordingsSubject.complete();
+
+        this.voicemails = {};
+        this.voicemailsSubject.complete();
     }
 
     // privates
@@ -826,6 +937,7 @@ export class Model {
     private callsSubject: Subject<Event> = new Subject();
     private queuesSubject: Subject<Event> = new Subject();
     private recordingsSubject: Subject<Event> = new Subject();
+    private voicemailsSubject: Subject<Event> = new Subject();
 }
 
 /**

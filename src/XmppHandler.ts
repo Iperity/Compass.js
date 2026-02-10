@@ -16,6 +16,8 @@ import {
     User,
     UserCallPoint,
     UserStatus,
+    Voicemail,
+    VoicemailMessage,
 } from "./Model";
 import {ObjectType, parseBoolean, parseNumberOrNull, ParserRegistry, parseWrapupState} from "./Parsers";
 import * as $ from "jquery";
@@ -401,6 +403,9 @@ class XmppNotificationHandler {
                 break;
             case "notification.recording":
                 this.handleRecordingNotification(not);
+                break;
+            case "notification.voicemail":
+                this.handleVoicemailNotification(not);
                 break;
             default:
                 compassLogger.warn(`Don't know how to handle notification type ${type} .`);
@@ -835,13 +840,43 @@ class XmppNotificationHandler {
         }
     }
 
-    /*
-     * Utility
-     */
+    protected handleVoicemailNotification(not: JQuery) {
+        compassLogger.debug("Voicemail Notification Received");
+        const type = not.attr("type");
 
-    /*
-     * Get the notification-type at level 'level', 0 is the first level.
-     */
+        switch (type) {
+             case "notification.voicemail.message.create":
+                this.handleVoicemailMessageCreateNotification(not);
+                break;
+            default:
+                compassLogger.warn(
+                    `Don't know how to handle notification type ${type} .`
+                );
+                break;
+        }
+    }
+
+    protected handleVoicemailMessageCreateNotification(not: JQuery) {
+        compassLogger.debug("Voicemail Message Create Notification Received");
+        const messageElem = not.find(">voicemailMessage");
+        const voicemailId = messageElem.find(">voicemailId").text();
+        const voicemailMessage = this._parser.parse(
+             messageElem,
+             ObjectType.VoicemailMessage
+        ) as VoicemailMessage;
+
+        const voicemail = this._xmppHandler.model.voicemails[voicemailId];
+        if (voicemail) {
+            voicemail.messages.content.unshift(voicemailMessage);
+            voicemail.messages.total++;
+            if (voicemail.messages.content.length > voicemail.messages.size) {
+                voicemail.messages.content.pop();
+            }
+            voicemail.domain.notify(new Event(voicemail, EventType.Added, { message: voicemailMessage }));
+        } else {
+            compassLogger.warn(`Received voicemail message for unknown voicemail box ${voicemailId}`);
+        }
+    }
     protected getNotificationTypeUpToLevel(type: string, level: number) {
         if (level < 0) throw new Error(`getTypeLevel: level ${level} is below 0.`);
         const dotSeparated = type.split(".");
